@@ -1,0 +1,10 @@
+{
+  "name": "web-sem",
+  "version": "1.0.0",
+  "description": "Semestral work for the KIV/WEB course",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "bootstrap": "^5.3.8"
+  }
+}
