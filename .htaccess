@@ -3,12 +3,15 @@ AddDefaultCharset UTF-8
 ServerSignature Off
 FileETag none
 
-<IfModule mod_rewrite.c >
-    RewriteEngine On
-</IfModule>
-
-RewriteCond %{REQUEST_FILENAME}.php -f
-RewriteRule !.*\.php$ %{REQUEST_FILENAME}.php [QSA,L]
+RewriteEngine On
+RewriteBase /
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteCond %{THE_REQUEST} \s/([^.]*)\.php?\s [NC]
+RewriteRule ^ %1? [R=301,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^(.*)/?$ /$1.php [QSA,L]
 
 # MIME TYPES
 <IfModule mod_mime.c>
