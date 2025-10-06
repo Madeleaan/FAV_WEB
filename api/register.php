@@ -2,14 +2,13 @@
 global $pdo;
 include 'db.php';
 
-header("Content-type: application/json");
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
 if ($method == 'POST') {
     register($pdo, $input);
 } else {
-    error(405, 'Method '.$method.' is not allowed');
+    error(405, "Method $method is not allowed");
 }
 
 function register($pdo, $input) {
