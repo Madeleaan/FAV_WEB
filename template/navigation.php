@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary px-3 border-bottom">
+<nav class="navbar navbar-expand-lg bg-body-tertiary px-3 border-bottom">
     <a class="navbar-brand" href="/">Navbar</a> <!-- TODO branding -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapsible">
         <span class="navbar-toggler-icon"></span>
@@ -22,7 +22,7 @@
                     <i class="fas fa-user me-1"></i>
                 <?php
                     $user_data = file_get_contents("http://$_SERVER[HTTP_HOST]/api/user?login=$sesh");
-                    echo json_decode($user_data, true)['name'];
+                    echo htmlspecialchars(json_decode($user_data, true)['name']);
                 ?></a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="#" id="logoutBtn">Odhlásit</a></li>
