@@ -1,18 +1,18 @@
-<nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary px-3">
-    <a class="navbar-brand" href="/index">Navbar</a> <!-- TODO branding -->
+<nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary px-3 border-bottom">
+    <a class="navbar-brand" href="/">Navbar</a> <!-- TODO branding -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapsible">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapsible">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <?php
-            $links = array("Informace"=>"/index", "Články"=>"/clanky");
+            $links = array("Informace"=>"/", "Články"=>"/clanky");
             foreach ($links as $label => $url): ?>
             <li class="nav-item">
-                <a class="nav-link <?php if (str_contains($_SERVER['REQUEST_URI'], $url)) echo 'active'; ?>"
+                <a class="nav-link <?php if (str_ends_with($_SERVER['REQUEST_URI'], $url)) echo 'active'; ?>"
                    href="<?= $url; ?>"><?=$label?></a>
             </li>
-            <?php endforeach; ?>
+            <?php endforeach ?>
 
         </ul>
         <?php
@@ -34,12 +34,7 @@
                 </ul>
                 </div>
         <?php else: ?>
-            <a class="nav-link navbar-text" href="#" id="loginBtn"><i class="fas fa-user-lock me-1"></i>Přihlásit</a>
-            <script>
-                $("#loginBtn").click(function () {
-                    $.post("api/login", '{"login":"a", "password":"b"}').always(() => location.reload());
-                })
-            </script>
+            <a class="nav-link navbar-text" href="/login" id="loginBtn"><i class="fas fa-user-lock me-1"></i>Přihlásit</a>
         <?php endif; ?>
     </div>
 </nav>
