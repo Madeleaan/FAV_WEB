@@ -8,6 +8,7 @@
 </head>
 <body>
 <?php include 'template/navigation.php' ?>
+<div></div>
 <?php include 'template/footer.php' ?>
 </body>
 </html>

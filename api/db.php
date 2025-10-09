@@ -14,8 +14,8 @@
         die("Connection failed: ".$e->getMessage());
     }
 
-    function error($code, $message) {
+    function error($code, $message, $err) {
         http_response_code($code);
-        echo json_encode(array("error" => $message));
+        echo json_encode(array("msg" => $message, "error" => $err));
         die();
     }

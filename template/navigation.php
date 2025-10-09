@@ -25,7 +25,7 @@
                     echo htmlspecialchars(json_decode($user_data, true)['name']);
                 ?></a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#" id="logoutBtn">Odhlásit</a></li>
+                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-right-from-bracket"></i>Odhlásit</a></li>
                     <script>
                         $('#logoutBtn').click(() => {
                             $.post("api/logout").always(() => location.reload());

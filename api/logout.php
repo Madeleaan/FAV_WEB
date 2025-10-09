@@ -7,7 +7,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method == 'POST') {
     logout();
 } else {
-    error(405, "Method $method is not allowed");
+    error(405, "Method $method is not allowed", "BAD_METHOD");
 }
 
 function logout() {
