@@ -16,6 +16,6 @@
 
     function error($code, $message, $err) {
         http_response_code($code);
-        echo json_encode(array("msg" => $message, "error" => $err));
+        echo json_encode(["msg" => $message, "error" => $err]);
         die();
     }

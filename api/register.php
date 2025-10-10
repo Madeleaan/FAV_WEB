@@ -24,6 +24,7 @@ function register($pdo, $input) {
     $sql = "INSERT INTO users (login, password, name) VALUES (:login, :password, :name)";
     $stmt = $pdo->prepare($sql);
     $passhash = password_hash($input['password'], PASSWORD_BCRYPT);
-    $stmt->execute(['login' => $input['login'], 'password' => $passhash, 'name' => $input['name']]);
-    echo json_encode(array("status" => 200));
+    $cleanName = htmlspecialchars($input['name']);
+    $stmt->execute(['login' => $input['login'], 'password' => $passhash, 'name' => $cleanName]);
+    echo json_encode(["status" => 200]);
 }

@@ -55,7 +55,44 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
                         </div>
                     </form>
                 </div>
-                <div class="tab-pane fade" id="register"><p>Register</p></div>
+                <div class="tab-pane fade py-2" id="register">
+                    <form class="row g-3" id="register-form">
+                        <div class="col-md-6">
+                            <label for="register-login" class="form-label">Uživatelské jméno</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="register-login" name="login" required>
+                                <div class="invalid-feedback" id="register-login-feedback">Uživatelské již existuje!</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="register-name" class="form-label">Jméno a příjmení</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-address-card"></i></span>
+                                <input type="text" class="form-control" id="register-name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="register-pass" class="form-label">Heslo</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="register-pass" required>
+                                <div class="invalid-feedback" id="register-pass-feedback">Heslo musí mít minimálně 6 znaků!</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="register-pass-repeat" class="form-label">Kontrola hesla</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="register-pass-repeat" name="password" required>
+                                <div class="invalid-feedback" id="register-pass-repeat-feedback">Hesla nesedí!</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary col-12 col-md-4" type="submit">Registrovat</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="col-lg-3 col-sm-1"></div>
@@ -66,11 +103,11 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
 </body>
 
 <script>
-    $("#login-form").submit(function(e)  {
+    $("#login-form").submit((e) =>  {
         e.preventDefault()
         $("input").each((_, el) => el.classList.remove('is-invalid'))
 
-        let formData = $(this).serializeArray()
+        let formData = $("#login-form").serializeArray()
         let postData = {}
         $.each(formData, (k, v) => postData[v.name] = v.value)
         $.ajax({
@@ -83,7 +120,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
                 let ref = document.referrer
 
                 if (ref && ref !== '') location.replace(ref)
-                else location.replace('/')
+                else location.replace(location.host)
             },
             error: (data) => {
                 let msg = JSON.parse(data.responseText)
@@ -91,6 +128,48 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
                 else if (msg.error === 'BAD_PASS') $("#login-pass").addClass('is-invalid')
             }
         })
+    })
+
+    let elPass = $("#register-pass")
+    let elPassRepeat = $("#register-pass-repeat")
+    elPass.on('input', () => validatePassword())
+    elPassRepeat.on('input', () => validatePassword())
+
+    function validatePassword() {
+        elPass.removeClass('is-invalid')
+        elPassRepeat.removeClass('is-invalid')
+        let isValid = true
+        if(elPass.val().length < 6) {
+            elPass.addClass('is-invalid')
+            isValid = false
+        }
+        if(elPass.val() !== elPassRepeat.val()) {
+            elPassRepeat.addClass('is-invalid')
+            isValid = false
+        }
+        return isValid
+    }
+
+    $("#register-form").submit((e) => {
+        e.preventDefault()
+        $("input").each((_, el) => el.classList.remove('is-invalid'))
+        if(validatePassword()) {
+            let formData = $("#register-form").serializeArray()
+            let postData = {}
+            $.each(formData, (k, v) => postData[v.name] = v.value)
+            $.ajax({
+                url: '/api/register',
+                type: 'POST',
+                data: JSON.stringify(postData),
+                processData: false,
+                contentType: false,
+                success: () => location.reload(),
+                error: (data) => {
+                    let msg = JSON.parse(data.responseText)
+                    if (msg.error === 'LOGIN_EXISTS') $("#register-login").addClass('is-invalid')
+                }
+            })
+        }
     })
 </script>
 </html>
