@@ -1,27 +1,25 @@
 <?php
-global $pdo;
-include 'db.php';
-
 $method = $_SERVER['REQUEST_METHOD'];
+header("Content-Type: application/json");
 
 if ($method == 'GET') {
-    getUser($pdo, $_GET);
-} else {
-    error(405, "Method $method is not allowed");
-}
-
-function getUser($pdo, $input) {
-    if (empty($input['login'])) {
-        error(400, 'Login is required');
+    $api = new API();
+    if (empty($_GET['login'])) {
+        error(new ApiError(ApiErrorList::MISSING_PARAMS));
+    } else {
+        $login = $_GET['login'];
+        $res = $api->getUser($login);
+        if ($res instanceof User) {
+            echo json_encode ([
+                "login" => $res->login,
+                "name" => $res->name,
+                "role" => $res->role,
+                "enabled" => $res->enabled,
+            ]);
+        } else {
+            error($res);
+        }
     }
-
-    $sql = "SELECT name FROM users WHERE login = :login";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['login' => $input['login']]);
-    if ($stmt->rowCount() == 0) error(400, 'Login does not exist');
-
-    $data = $stmt->fetch();
-    unset($data[0]);
-    echo json_encode($data);
-    return $data;
+} else {
+    error(new ApiError(ApiErrorList::BAD_METHOD));
 }

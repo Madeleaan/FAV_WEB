@@ -1,16 +1,12 @@
 <?php
-global $pdo;
-include 'db.php';
-
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method == 'POST') {
     logout();
 } else {
-    error(405, "Method $method is not allowed", "BAD_METHOD");
+    error(new ApiError(ApiErrorList::BAD_METHOD));
 }
 
-function logout() {
-    session_start();
+function logout(): void {
     $_SESSION['login'] = null;
 }

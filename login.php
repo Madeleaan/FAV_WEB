@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 if (isset($_SESSION['login'])) header('Location: /') ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
@@ -103,7 +103,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
 </body>
 
 <script>
-    $("#login-form").submit((e) =>  {
+    $("#login-form").on('submit', (e) =>  {
         e.preventDefault()
         $("input").each((_, el) => el.classList.remove('is-invalid'))
 
@@ -124,8 +124,8 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
             },
             error: (data) => {
                 let msg = JSON.parse(data.responseText)
-                if (msg.error === 'BAD_LOGIN') $("#login-login").addClass('is-invalid')
-                else if (msg.error === 'BAD_PASS') $("#login-pass").addClass('is-invalid')
+                if (msg.error === 400) $("#login-login").addClass('is-invalid')
+                else if (msg.error === 403) $("#login-pass").addClass('is-invalid')
             }
         })
     })

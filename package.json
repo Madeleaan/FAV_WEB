@@ -6,6 +6,9 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.1.0",
     "bootstrap": "^5.3.8",
-    "jquery": "^3.7.1"
+    "jquery": "^3.7.1",
+    "datatables.net": "^2.3.4",
+    "datatables.net-bs5": "^2.3.4",
+    "datatables.net-plugins": "^2.3.2"
   }
 }

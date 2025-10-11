@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary px-3 border-bottom">
+<nav class="navbar navbar-expand-lg bg-body-tertiary px-3 border-bottom mb-3">
     <a class="navbar-brand" href="/">Navbar</a> <!-- TODO branding -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapsible">
         <span class="navbar-toggler-icon"></span>
@@ -16,23 +16,33 @@
 
         </ul>
         <?php
-        if (array_key_exists('login', $_SESSION) && isset($_SESSION['login'])): $sesh = $_SESSION['login'];?>
-                <div class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                    <i class="fas fa-user me-1"></i>
-                <?php
-                    $user_data = file_get_contents("http://$_SERVER[HTTP_HOST]/api/user?login=$sesh");
-                    echo json_decode($user_data, true)['name'];
-                ?></a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-right-from-bracket me-1"></i>Odhlásit</a></li>
-                    <script>
-                        $('#logoutBtn').click(() => {
-                            $.post("api/logout").always(() => location.reload());
-                        })
-                    </script>
-                </ul>
-                </div>
+        if (!empty($_SESSION['login'])):
+            $api = new API();
+            $user = $api->getUser($_SESSION['login']);?>
+            <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                <i class="fas fa-user me-1"></i>
+            <?php echo htmlspecialchars($user->name) ?></a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item">
+                    <i class="fas fa-medal me-1"></i>Role: <?php echo Role::str($user->role) ?></a>
+                </a></li>
+                <?php if ($user->role >= Role::ADMIN): ?>
+                    <li><a class="dropdown-item" href="/admin/usercontrol">
+                        <i class="fas fa-users me-1"></i>Správa uživatelů
+                    </a></li>
+                <?php endif ?>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutBtn">
+                    <i class="fas fa-right-from-bracket me-1"></i>Odhlásit
+                </a></li>
+                <script>
+                    $('#logoutBtn').click(() => {
+                        $.post("/api/logout", () => location.reload())
+                    })
+                </script>
+            </ul>
+            </div>
         <?php else: ?>
             <a class="nav-link navbar-text" href="/login" id="loginBtn"><i class="fas fa-user-lock me-1"></i>Přihlásit</a>
         <?php endif; ?>
