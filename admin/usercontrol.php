@@ -10,7 +10,7 @@
 </head>
 <body>
 <?php include '../template/navigation.php' ?>
-<div class="mx-5 d-block overflow-x-hidden">
+<div class="mx-2 mx-md-4 d-block overflow-x-hidden">
     <h2 class="text-center">Správa uživatelů</h2>
     <?php
         $api = new Api();

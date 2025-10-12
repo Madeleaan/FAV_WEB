@@ -15,36 +15,38 @@
             <?php endforeach ?>
 
         </ul>
-        <?php
-        if (!empty($_SESSION['login'])):
-            $api = new API();
-            $user = $api->getUser($_SESSION['login']);?>
-            <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                <i class="fas fa-user me-1"></i>
-            <?php echo htmlspecialchars($user->name) ?></a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item">
-                    <i class="fas fa-medal me-1"></i>Role: <?php echo Role::str($user->role) ?></a>
-                </a></li>
-                <?php if ($user->role >= Role::ADMIN): ?>
-                    <li><a class="dropdown-item" href="/admin/usercontrol">
-                        <i class="fas fa-users me-1"></i>Správa uživatelů
-                    </a></li>
-                <?php endif ?>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#" id="logoutBtn">
-                    <i class="fas fa-right-from-bracket me-1"></i>Odhlásit
-                </a></li>
-                <script>
-                    $('#logoutBtn').click(() => {
-                        $.post("/api/logout", () => location.reload())
-                    })
-                </script>
-            </ul>
-            </div>
-        <?php else: ?>
-            <a class="nav-link navbar-text" href="/login" id="loginBtn"><i class="fas fa-user-lock me-1"></i>Přihlásit</a>
-        <?php endif; ?>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <?php
+            if (!empty($_SESSION['login'])):
+                $api = new API();
+                $user = $api->getUser($_SESSION['login']);?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>
+                    <?php echo htmlspecialchars($user->name) ?></a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item">
+                            <i class="fas fa-medal me-1"></i>Role: <?php echo Role::str($user->role) ?></a>
+                        </a></li>
+                        <?php if ($user->role >= Role::ADMIN): ?>
+                            <li><a class="dropdown-item" href="/admin/usercontrol">
+                                <i class="fas fa-users me-1"></i>Správa uživatelů
+                            </a></li>
+                        <?php endif ?>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="logoutBtn">
+                            <i class="fas fa-right-from-bracket me-1"></i>Odhlásit
+                        </a></li>
+                        <script>
+                            $('#logoutBtn').click(() => {
+                                $.post("/api/logout", () => location.reload())
+                            })
+                        </script>
+                    </ul>
+                </li>
+            <?php else: ?>
+                <a class="nav-link navbar-text" href="/login" id="loginBtn"><i class="fas fa-user-lock me-1"></i>Přihlásit</a>
+            <?php endif; ?>
+        </ul>
     </div>
 </nav>
