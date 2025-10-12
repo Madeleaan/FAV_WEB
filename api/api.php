@@ -62,13 +62,39 @@ class API {
     function toggleUser(string $login): null | ApiError {
         if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
 
-
         $user = $this->getUser($login);
         if ($user instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
         if ($this->currentUser()->role->value <= $user->role->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $sql = "UPDATE users SET enabled = :enabled WHERE login = :login";
         $params = ["enabled" => $user->enabled ? 0 : 1, "login" => $login];
+        $this->fetchSQL($sql, $params);
+        return null;
+    }
+
+    function deleteUser(string $login): null | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $user = $this->getUser($login);
+        if ($user instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
+        if ($this->currentUser()->role->value <= $user->role->value) return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "DELETE FROM users WHERE login = :login";
+        $params = ["login" => $login];
+        $this->fetchSQL($sql, $params);
+        return null;
+    }
+
+    function changeRole(string $login, int $role): null | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $user = $this->getUser($login);
+        if ($user instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
+        if ($this->currentUser()->role->value <= $user->role->value) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($this->currentUser()->role->value <= $role) return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "UPDATE users SET role = :role WHERE login = :login";
+        $params = ["role" => $role, "login" => $login];
         $this->fetchSQL($sql, $params);
         return null;
     }

@@ -19,6 +19,14 @@ if ($method == 'GET') {
             if (empty($input['login'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
             toggleUser($input['login']);
             break;
+        case 'delete-user':
+            if (empty($input['login'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
+            deleteUser($input['login']);
+            break;
+        case 'change-role':
+            if (empty($input['login']) || empty($input['role'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
+            changeRole($input['login'], $input['role']);
+            break;
         default:
             error(new ApiError(ApiErrorList::BAD_TASK));
     }
@@ -39,6 +47,20 @@ function listUsers(): void {
 function toggleUser(string $login): void {
     $api = new API();
     $res = $api->toggleUser($login);
+    if ($res != null) error($res);
+    else echo json_encode(["status" => 200]);
+}
+
+function deleteUser(string $login): void {
+    $api = new API();
+    $res = $api->deleteUser($login);
+    if ($res != null) error($res);
+    else echo json_encode(["status" => 200]);
+}
+
+function changeRole(string $login, string $role): void {
+    $api = new API();
+    $res = $api->changeRole($login, $role);
     if ($res != null) error($res);
     else echo json_encode(["status" => 200]);
 }

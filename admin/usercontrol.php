@@ -23,16 +23,17 @@
                     <th>Login</th>
                     <th>Jméno</th>
                     <th>Role</th>
-                    <th>Aktivní</th>
+                    <th>Akce</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($users as $user): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($user->login) ?></td>
-                        <td><?php echo htmlspecialchars($user->name) ?></td>
-                        <td class="text-start"><?php echo $user->role->value ?></td>
-                        <td class="text-end"><?php echo $user->role->value < $api->currentUser()->role->value ? json_encode($user->enabled) : "" ?></td>
+                        <td class="align-middle"><?php echo htmlspecialchars($user->login) ?></td>
+                        <td class="align-middle"><?php echo htmlspecialchars($user->name) ?></td>
+                        <td class="text-start align-middle"><?php echo $user->role->value ?></td>
+                        <td class="text-end align-middle">
+                            <?php echo $user->role->value < $api->currentUser()->role->value ? json_encode($user->enabled) : "" ?></td>
                     </tr>
                 <?php endforeach ?>
             </tbody>
@@ -63,10 +64,26 @@
 <?php include '../template/footer.php' ?>
 </body>
 <script>
-    $(() => {
+    $(async () => {
+        const roles = {
+            1: 'Autor',
+            2: 'Editor',
+            3: 'Admin',
+            4: 'SUPERADMIN'
+        }
+
+        let admin;
+        await $.get(
+            `/api/user?login=${$('#userDropdown').text().trim()}`,
+            (data) => admin = data
+        )
+
         let table = $('table').DataTable({
             scrollX: true,
-            order: [[2, 'desc']],
+            order: [
+                [2, 'desc'],
+                [0, 'asc']
+            ],
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.4/i18n/cs.json'
             },
@@ -75,27 +92,42 @@
                 { data: 'user', type: 'czech'},
                 {
                     data: 'role',
-                    render: (data, type) => {
+                    width: '10%',
+                    render: (data, type, row, meta) => {
                         if (type !== 'display') return data
-                        const roles = {
-                            1: 'Autor',
-                            2: 'Editor',
-                            3: 'Admin',
-                            4: 'SUPERADMIN'
+                        if (row.login === admin.login) return `<b>${roles[data]}</b>`
+
+                        let html = `<select class="form-select roleSelect" aria-label="Role select"
+                            data-action="change" data-login="${row.login}" data-row=${meta.row}>`
+                        for (const [k, v] of Object.entries(roles)) {
+                            html += `<option value="${k}" data-bs-toggle="modal" data-bs-target="#modal"`
+                            if (k === data) html += " selected"
+                            if (k >= admin.role) html += " disabled "
+                            html += `>${v}</option>`
                         }
-                        return roles[data] ?? 'Neznámá role'
+                        html += `</select>`
+
+                        $('.roleSelect')
+                            .on('click', (ev) => ev.target.setAttribute('data-prev', ev.target.value))
+
+                        return html
                     },
                 },
                 {
                     data: 'enabled',
+                    width: '20%',
                     render: (data, type, row, meta) => {
                         if (type !== 'display') return data
+                        const dataTags = `data-login="${row.login}" data-row=${meta.row} data-bs-toggle="modal" data-bs-target="#modal"`
+                        const delBtn = `<button class="btn btn-outline-info ms-3" ${dataTags} data-action="delete">
+                            <i class="fa-solid fa-trash-can me-1"></i>Smazat</button>`
+
                         if (data === 'true') {
-                            return `<button class="btn btn-outline-danger" data-login=${row.login} data-row=${meta.row}
-                                data-action="disable" data-bs-toggle="modal" data-bs-target="#modal">ⓧ Zakázat</button>`
+                            return `<button class="btn btn-outline-danger" ${dataTags} data-action="disable">
+                                <i class="fa-solid fa-square-xmark me-1"></i>Zakázat</button>` + delBtn
                         } else if (data === 'false') {
-                            return `<button class="btn btn-outline-success" data-login=${row.login} data-row=${meta.row}
-                                data-action="enable" data-bs-toggle="modal" data-bs-target="#modal">☑ Povolit</button>`
+                            return `<button class="btn btn-outline-success" ${dataTags} data-action="enable">
+                                <i class="fa-solid fa-square-check me-1"></i>Povolit</button>` + delBtn
                         } else {
                             return data
                         }
@@ -104,35 +136,74 @@
             ],
         })
 
-        $('#modal').on('show.bs.modal', (e) => {
-            const btn = e.relatedTarget;
-            const action = btn.getAttribute('data-action');
-            const okBtn = $('#modalOk');
+        $('#modal')
+            .on('hidden.bs.modal', () => $('.modal-backdrop').hide())
+            .on('show.bs.modal', async (e) => {
+                const btn = e.relatedTarget;
+                const action = btn.getAttribute('data-action');
+                const login = btn.getAttribute('data-login');
+                const title = $('.modal-title')
+                const body = $('.modal-body')
+                const okBtn = $('#modalOk');
 
-            okBtn.attr('data-login', btn.getAttribute('data-login'));
-            okBtn.attr('data-row', btn.getAttribute('data-row'));
+                okBtn.attr('data-login', login);
+                okBtn.attr('data-row', btn.getAttribute('data-row'));
+                okBtn.attr('data-action', action);
 
-            if (action === 'disable') {
-                $('.modal-title').text('Zakázat uživatele')
-                $('.modal-body').text('Opravdu chcete zakázat uživatele?')
-            } else if (action === 'enable') {
-                $('.modal-title').text('Povolit uživatele')
-                $('.modal-body').text('Opravdu chcete povolit uživatele?')
-            }
-        })
+                if (action === 'disable') {
+                    title.text('Zakázat uživatele')
+                    body.text(`Opravdu chcete zakázat uživatele '${login}'?`)
+                } else if (action === 'enable') {
+                    title.text('Povolit uživatele')
+                    body.text(`Opravdu chcete povolit uživatele '${login}'?`)
+                } else if (action === 'delete') {
+                    title.text('Smazat uživatele')
+                    body.text(`Opravdu chcete smazat uživatele '${login}'?\nTato akce nejde vrátit!!`)
+                    body.html(body.html().replace('\n', '<br>'))
+                } else {
+                    const parent = btn.parentElement
+                    title.text('Upravit uživatele')
+                    await body.text(`Opravdu chcete nastavit roli uživatele '${parent.getAttribute('data-login')}'
+                        na '${roles[btn.value]}'?`)
+                    await okBtn.attr('data-role', btn.value)
+                    okBtn.attr('data-login', parent.getAttribute('data-login'))
+                    okBtn.attr('data-row', parent.getAttribute('data-row'))
+                    parent.value = parent.getAttribute('data-prev');
+                }
+            })
+
 
         $('#modalOk').on('click', () => {
             const okBtn = $('#modalOk');
             const login = okBtn.attr('data-login')
             const row = Number(okBtn.attr('data-row'))
-            $.post(
-                '/api/admin',
-                JSON.stringify({"task": "toggle-user", "login": login}),
-                () => {
-                    const cell = table.cell({row: row, column: 3})
-                    cell.data(cell.data() === 'true' ? 'false' : 'true').draw()
-                }
-            )
+            const action = okBtn.attr('data-action');
+            if (['enable', 'disable'].includes(action)) {
+                $.post(
+                    '/api/admin',
+                    JSON.stringify({"task": "toggle-user", "login": login}),
+                    () => {
+                        const cell = table.cell({row: row, column: 3})
+                        cell.data(cell.data() === 'true' ? 'false' : 'true').draw()
+                    }
+                )
+            } else if (action === 'delete') {
+                $.post(
+                    '/api/admin',
+                    JSON.stringify({"task": "delete-user", "login": login}),
+                    () => {
+                        table.row(row).remove().draw()
+                    }
+                )
+            } else {
+                $.post(
+                    '/api/admin',
+                    JSON.stringify({"task": "change-role", "login": login, "role": okBtn.attr('data-role')}),
+                    () => {
+                        table.cell({row: row, column: 2}).data(okBtn.attr('data-role')).draw()
+                    }
+                )
+            }
         })
     })
 </script>
