@@ -28,7 +28,11 @@
                         <li><a class="dropdown-item">
                             <i class="fas fa-medal me-1"></i>Role: <?php echo Role::str($user->role) ?></a>
                         </a></li>
-                        <?php if ($user->role >= Role::ADMIN): ?>
+                        <?php if ($user->role == Role::AUTHOR): ?>
+                            <li><a class="dropdown-item" href="/author/articles">
+                                <i class="fas fa-newspaper me-1"></i> Moje články
+                            </a></li>
+                        <?php elseif ($user->role >= Role::ADMIN): ?>
                             <li><a class="dropdown-item" href="/admin/usercontrol">
                                 <i class="fas fa-users me-1"></i>Správa uživatelů
                             </a></li>

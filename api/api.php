@@ -116,6 +116,33 @@ class API {
         if ($user instanceof ApiError) return null;
         return $user;
     }
+
+    function getUserArticles(string $login): array | ApiError {
+        if ($login == null) return new ApiError(ApiErrorList::BAD_LOGIN);
+        if ($this->getUser($login) instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
+
+        $sql = "SELECT a.id, title, date, abstract, file FROM articles a
+            JOIN users u ON u.id = a.author WHERE login = :login";
+        $params = ['login' => $login];
+        $data = $this->fetchSQL($sql, $params);
+        $res = [];
+        foreach ($data as $article) $res[] = new Article($article);
+        return $res;
+    }
+
+    function deleteArticle(int $id): null | ApiError {
+        if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
+
+        $sql = "SELECT login FROM articles a 
+              JOIN users u ON u.id = a.author WHERE a.id = :id";
+        $params = ["id" => $id];
+        $data = $this->fetchSQL($sql, $params);
+        if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "DELETE FROM articles WHERE id = :id";
+        $this->fetchSQL($sql, $params);
+        return null;
+    }
 }
 
 enum Role: int
@@ -151,6 +178,22 @@ class User {
         $this->name = $data['name'];
         $this->role = Role::from(intval($data['role']));
         $this->enabled = boolval($data['enabled']);
+    }
+}
+
+class Article {
+    public int $id;
+    public string $title;
+    public DateTime $date;
+    public string $abstract;
+    public string $file;
+
+    function __construct($data) {
+        $this->id = $data["id"];
+        $this->title = $data['title'];
+        $this->date = new DateTime($data['date']);
+        $this->abstract = $data['abstract'];
+        $this->file = $data['file'];
     }
 }
 

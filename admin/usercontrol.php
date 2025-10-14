@@ -56,7 +56,7 @@
             </div>
         </div>
     <?php elseif ($users->getCode() == 403): ?>
-        <div class="alert alert-danger" role="alert">Nedostatečná práva pro zobrazení</div>
+        <div class="alert alert-danger" role="alert">Obsah pouze pro administrátory</div>
     <?php else: ?>
         <div class="alert alert-danger" role="alert">Chyba: <?php echo $users->getMessage() ?></div>
     <?php endif ?>
