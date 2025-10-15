@@ -30,7 +30,7 @@
                         </a></li>
                         <?php if ($user->role == Role::AUTHOR): ?>
                             <li><a class="dropdown-item" href="/author/articles">
-                                <i class="fas fa-newspaper me-1"></i> Moje články
+                                <i class="fas fa-newspaper me-1"></i>Moje články
                             </a></li>
                         <?php elseif ($user->role >= Role::ADMIN): ?>
                             <li><a class="dropdown-item" href="/admin/usercontrol">

@@ -21,6 +21,7 @@ enum ApiErrorList {
     case DB_ERROR;
     case DISABLED_USER;
     case NO_ACCESS;
+    case ARTICLE_PUBLIC;
 }
 
 class ApiError extends Exception {
@@ -36,6 +37,7 @@ class ApiError extends Exception {
             ApiErrorList::DB_ERROR => parent::__construct('Database error', 500),
             ApiErrorList::DISABLED_USER => parent::__construct('Disabled user', 403),
             ApiErrorList::NO_ACCESS => parent::__construct('No access', 403),
+            ApiErrorList::ARTICLE_PUBLIC => parent::__construct('Article is public, cant edit or delete it', 403),
         };
     }
 }

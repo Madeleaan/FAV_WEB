@@ -29,10 +29,11 @@ CREATE TABLE `articles` (
   `abstract` text NOT NULL,
   `file` text NOT NULL,
   `author` int(11) NOT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `con_author` (`author`),
   CONSTRAINT `con_author` FOREIGN KEY (`author`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +42,7 @@ CREATE TABLE `articles` (
 
 LOCK TABLES `articles` WRITE;
 /*!40000 ALTER TABLE `articles` DISABLE KEYS */;
-INSERT INTO `articles` VALUES (1,'Test article','2025-10-13','Test testing test','test.pdf',3),(2,'Test article 2','2025-10-19','More testing stuff','test.pdf',3);
+INSERT INTO `articles` VALUES (1,'Test article','2025-10-13','This is a test','test.pdf',3,1),(2,'Test article 2','2025-10-19','<p>Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> Test <strong>testing</strong> <em>Test </em> </p>','test.pdf',3,0);
 /*!40000 ALTER TABLE `articles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -113,4 +114,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-14 20:03:38
+-- Dump completed on 2025-10-16  1:29:52

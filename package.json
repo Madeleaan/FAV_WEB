@@ -9,6 +9,7 @@
     "jquery": "^3.7.1",
     "datatables.net": "^2.3.4",
     "datatables.net-bs5": "^2.3.4",
-    "datatables.net-plugins": "^2.3.2"
+    "datatables.net-plugins": "^2.3.2",
+    "quill": "^2.0.3"
   }
 }

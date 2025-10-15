@@ -121,7 +121,7 @@ class API {
         if ($login == null) return new ApiError(ApiErrorList::BAD_LOGIN);
         if ($this->getUser($login) instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
 
-        $sql = "SELECT a.id, title, date, abstract, file FROM articles a
+        $sql = "SELECT a.* FROM articles a
             JOIN users u ON u.id = a.author WHERE login = :login";
         $params = ['login' => $login];
         $data = $this->fetchSQL($sql, $params);
@@ -133,15 +133,32 @@ class API {
     function deleteArticle(int $id): null | ApiError {
         if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
 
-        $sql = "SELECT login FROM articles a 
-              JOIN users u ON u.id = a.author WHERE a.id = :id";
+        $sql = "SELECT login, public FROM articles a 
+                    JOIN users u ON u.id = a.author WHERE a.id = :id";
         $params = ["id" => $id];
         $data = $this->fetchSQL($sql, $params);
         if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
 
         $sql = "DELETE FROM articles WHERE id = :id";
         $this->fetchSQL($sql, $params);
         return null;
+    }
+
+    function updateArticle(int $id, string $title, string $abstract): null | ApiError {
+    if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
+
+    $sql = "SELECT login, public FROM articles a
+                JOIN users u ON u.id = a.author WHERE a.id = :id";
+    $params = ["id" => $id];
+    $data = $this->fetchSQL($sql, $params);
+    if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
+    if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
+
+    $sql = "UPDATE articles SET title = :title, abstract = :abstract WHERE id = :id";
+    $params = ["title" => $title, "abstract" => $abstract, "id" => $id];
+    $this->fetchSQL($sql, $params);
+    return null;
     }
 }
 
@@ -187,6 +204,7 @@ class Article {
     public DateTime $date;
     public string $abstract;
     public string $file;
+    public bool $public;
 
     function __construct($data) {
         $this->id = $data["id"];
@@ -194,6 +212,7 @@ class Article {
         $this->date = new DateTime($data['date']);
         $this->abstract = $data['abstract'];
         $this->file = $data['file'];
+        $this->public = boolval($data['public']);
     }
 }
 
