@@ -4,7 +4,7 @@
     <title>Title - Články</title> <!-- TODO branding -->
 
     <link rel="stylesheet" href="/node_modules/quill/dist/quill.bubble.css">
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script src="/node_modules/quill/dist/quill.js"></script>
     <?php include('template/commonhead.php') ?>
 </head>
 <body>
@@ -14,6 +14,7 @@
     $api = new API();
     $user = $api->currentUser();
     if ($user != null && $user->role == Role::AUTHOR): $articles = $api->getUserArticles($user->login); ?>
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#newModal"><i class="fas fa-newspaper me-1"></i>Přidat nový článek</button>
     <ul class="list-group gap-3">
         <?php foreach ($articles as $article): ?>
         <div class="card" data-article="<?=$article->id;?>">
@@ -62,7 +63,7 @@
                 </div>
                 <div>
                     <label class="form-label">Abstrakt</label>
-                    <div id="editEditor" class="bg-body-tertiary fs-6"></div>
+                    <div id="editEditor" class="bg-body-tertiary fs-6 border"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -72,10 +73,63 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="newModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Nový článek</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newTitle" class="form-label">Nadpis</label>
+                    <input type="text" name="title" id="newTitle" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Abstrakt</label>
+                    <div id="newEditor" class="bg-body-tertiary fs-6 border"></div>
+                </div>
+                <div>
+                    <label for="newFile" class="form-label">PDF soubor se článkem</label>
+                    <input class="form-control" name="file" type="file" id="newFile" accept="application/pdf">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavřít</button>
+                <button type="submit" class="btn btn-primary" id="newOk">Potvrdit</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 <script type="module">
     const editQuill = new Quill('#editEditor', {
         theme: 'bubble',
+    })
+
+    const newQuill = new Quill('#newEditor', {
+        theme: 'bubble'
+    })
+
+    $('#newOk').on('click', () => {
+        let title = $('#newTitle').val()
+        let abstract = newQuill.getSemanticHTML()
+        let file = $('#newFile').prop('files')[0]
+
+        let data = new FormData()
+        data.append('title', title)
+        data.append('abstract', abstract)
+        data.append('file', file)
+
+        $.post({
+            url: '/api/article',
+            enctype: 'multipart/form-data',
+            data: data,
+            processData: false,
+            contentType: false,
+            success: () => location.reload()
+        })
     })
 
     $('#editModal').on('show.bs.modal', (e) => {
@@ -99,8 +153,7 @@
             data: JSON.stringify(data),
             processData: false,
             contentType: false,
-            success: () => location.reload(),
-            error: (data) => console.log(data)
+            success: () => location.reload()
         })
     })
 
@@ -116,12 +169,7 @@
             type: 'DELETE',
             processData: false,
             contentType: false,
-            success: () => {
-                $(e.target).parentsUntil('.card').parent().remove()
-            },
-            error: (data) => {
-                console.log(data)
-            }
+            success: () => $(e.target).parentsUntil('.card').parent().remove()
         })
     })
 </script>

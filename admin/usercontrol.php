@@ -31,7 +31,7 @@
                     <tr>
                         <td class="align-middle"><?php echo htmlspecialchars($user->login) ?></td>
                         <td class="align-middle"><?php echo htmlspecialchars($user->name) ?></td>
-                        <td class="text-start align-middle"><?php echo $user->role->value ?></td>
+                        <td class="text-end align-middle"><?php echo $user->role->value ?></td>
                         <td class="text-end align-middle">
                             <?php echo $user->role->value < $api->currentUser()->role->value ? json_encode($user->enabled) : "" ?></td>
                     </tr>
@@ -87,6 +87,15 @@
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.4/i18n/cs.json'
             },
+            rowCallback: (row, data) => {
+                $(row).children().each((i, el) => {
+                    if (data['enabled'] === 'false') {
+                        $(el).addClass('bg-danger bg-opacity-10')
+                    } else {
+                        $(el).removeClass('bg-danger bg-opacity-10')
+                    }
+                })
+            },
             columns: [
                 { data: 'login' },
                 { data: 'user', type: 'czech'},
@@ -97,7 +106,7 @@
                         if (type !== 'display') return data
                         if (row.login === admin.login) return `<b>${roles[data]}</b>`
 
-                        let html = `<select class="form-select roleSelect" aria-label="Role select"
+                        let html = `<select class="form-select roleSelect w-auto ms-auto" aria-label="Role select"
                             data-action="change" data-login="${row.login}" data-row=${meta.row}>`
                         for (const [k, v] of Object.entries(roles)) {
                             html += `<option value="${k}" data-bs-toggle="modal" data-bs-target="#modal"`
@@ -119,14 +128,14 @@
                     render: (data, type, row, meta) => {
                         if (type !== 'display') return data
                         const dataTags = `data-login="${row.login}" data-row=${meta.row} data-bs-toggle="modal" data-bs-target="#modal"`
-                        const delBtn = `<button class="btn btn-outline-info ms-3" ${dataTags} data-action="delete">
-                            <i class="fa-solid fa-trash-can me-1"></i>Smazat</button>`
+                        const delBtn = `<button class="btn btn-outline-info ms-1" ${dataTags} data-action="delete">
+                            <i class="fa-solid fa-trash-can me-1"></i>Smazat</button></div>`
 
                         if (data === 'true') {
-                            return `<button class="btn btn-outline-danger" ${dataTags} data-action="disable">
+                            return `<div class="btn-group"><button class="btn btn-outline-danger" ${dataTags} data-action="disable">
                                 <i class="fa-solid fa-square-xmark me-1"></i>Zakázat</button>` + delBtn
                         } else if (data === 'false') {
-                            return `<button class="btn btn-outline-success" ${dataTags} data-action="enable">
+                            return `<div class="btn-group"><button class="btn btn-outline-success" ${dataTags} data-action="enable">
                                 <i class="fa-solid fa-square-check me-1"></i>Povolit</button>` + delBtn
                         } else {
                             return data

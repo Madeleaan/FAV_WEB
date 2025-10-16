@@ -21,6 +21,17 @@ if ($method == 'GET') {
     } else {
         updateArticle($input);
     }
+} else if ($method == 'POST') {
+    if (empty($_POST['title']) || empty($_POST['abstract']) || empty($_FILES['file'])) {
+        error(new ApiError(ApiErrorList::MISSING_PARAMS));
+    }  else {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $ftype = finfo_file($finfo, $_FILES['file']['tmp_name']);
+        finfo_close($finfo);
+
+        if ($ftype != 'application/pdf') error(new ApiError(ApiErrorList::BAD_FILE));
+        else postArticle($_POST, $_FILES['file']);
+    }
 } else {
     error(new ApiError(ApiErrorList::BAD_METHOD));
 }
@@ -59,4 +70,16 @@ function updateArticle(array $input): void {
     } else {
         echo json_encode(["status" => 200]);
     }
+}
+
+function postArticle(array $input, array $file): void {
+    $dir = "../storage/articles/";
+    do {
+        $orig = explode('.', $file['name']);
+        $filename = bin2hex(random_bytes(16)) . '.' . end($orig);
+    } while (file_exists($dir . $filename));
+    move_uploaded_file($file['tmp_name'], $dir . $filename);
+
+    $api = new API();
+    $api->postArticle($input['title'], $input['abstract'], $filename);
 }

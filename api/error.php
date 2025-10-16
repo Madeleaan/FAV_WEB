@@ -1,8 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\NoReturn;
-
-#[NoReturn]
 function error(ApiError $error): void
 {
     http_response_code($error->getCode());
@@ -22,6 +19,7 @@ enum ApiErrorList {
     case DISABLED_USER;
     case NO_ACCESS;
     case ARTICLE_PUBLIC;
+    case BAD_FILE;
 }
 
 class ApiError extends Exception {
@@ -38,6 +36,7 @@ class ApiError extends Exception {
             ApiErrorList::DISABLED_USER => parent::__construct('Disabled user', 403),
             ApiErrorList::NO_ACCESS => parent::__construct('No access', 403),
             ApiErrorList::ARTICLE_PUBLIC => parent::__construct('Article is public, cant edit or delete it', 403),
+            ApiErrorList::BAD_FILE => parent::__construct('Submitted file is in a bad format', 400),
         };
     }
 }

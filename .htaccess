@@ -13,7 +13,12 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/$1.php -f
 RewriteRule ^(.*)/?$ /$1.php [QSA,L]
 
-php_value include_path "/opt/lampp/htdocs:C:\xampp\htdocs:."
+# For windows
+php_value include_path "C:\xampp\htdocs"
+
+# For linux
+#php_value include_path "/opt/lampp/htdocs:."
+
 php_value auto_prepend_file "api/api.php"
 
 # MIME TYPES

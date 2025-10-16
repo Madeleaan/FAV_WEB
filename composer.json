@@ -2,7 +2,7 @@
   "require": {
     "ext-pdo": "*",
     "ext-json": "*",
-    "twig/twig": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-fileinfo": "*"
   }
 }

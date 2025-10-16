@@ -1,4 +1,4 @@
--- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
 --
 -- Host: 127.0.0.1    Database: web_sem
 -- ------------------------------------------------------
@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `articles`;
 CREATE TABLE `articles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text NOT NULL,
-  `date` date NOT NULL,
+  `date` date NOT NULL DEFAULT curdate(),
   `abstract` text NOT NULL,
   `file` text NOT NULL,
   `author` int(11) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE `articles` (
   PRIMARY KEY (`id`),
   KEY `con_author` (`author`),
   CONSTRAINT `con_author` FOREIGN KEY (`author`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -57,9 +57,9 @@ CREATE TABLE `reviews` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `article` int(11) NOT NULL,
   `editor` int(11) NOT NULL,
-  `quality` float DEFAULT NULL,
-  `language` float DEFAULT NULL,
-  `relevancy` float DEFAULT NULL,
+  `quality` float DEFAULT -1,
+  `language` float DEFAULT -1,
+  `relevancy` float DEFAULT -1,
   PRIMARY KEY (`id`),
   KEY `con_article` (`article`),
   KEY `con_editor` (`editor`),
@@ -114,4 +114,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-16  1:29:52
+-- Dump completed on 2025-10-16 20:43:33

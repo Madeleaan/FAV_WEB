@@ -122,7 +122,8 @@ class API {
         if ($this->getUser($login) instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
 
         $sql = "SELECT a.* FROM articles a
-            JOIN users u ON u.id = a.author WHERE login = :login";
+            JOIN users u ON u.id = a.author WHERE login = :login
+            ORDER BY a.date DESC";
         $params = ['login' => $login];
         $data = $this->fetchSQL($sql, $params);
         $res = [];
@@ -133,7 +134,7 @@ class API {
     function deleteArticle(int $id): null | ApiError {
         if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
 
-        $sql = "SELECT login, public FROM articles a 
+        $sql = "SELECT login, public, file FROM articles a 
                     JOIN users u ON u.id = a.author WHERE a.id = :id";
         $params = ["id" => $id];
         $data = $this->fetchSQL($sql, $params);
@@ -142,23 +143,44 @@ class API {
 
         $sql = "DELETE FROM articles WHERE id = :id";
         $this->fetchSQL($sql, $params);
+
+        $dir = "../storage/articles/";
+        unlink($dir . $data['file']);
+
         return null;
     }
 
     function updateArticle(int $id, string $title, string $abstract): null | ApiError {
-    if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
+        if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
 
-    $sql = "SELECT login, public FROM articles a
-                JOIN users u ON u.id = a.author WHERE a.id = :id";
-    $params = ["id" => $id];
-    $data = $this->fetchSQL($sql, $params);
-    if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
-    if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
+        $sql = "SELECT login, public FROM articles a
+                    JOIN users u ON u.id = a.author WHERE a.id = :id";
+        $params = ["id" => $id];
+        $data = $this->fetchSQL($sql, $params);
+        if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
 
-    $sql = "UPDATE articles SET title = :title, abstract = :abstract WHERE id = :id";
-    $params = ["title" => $title, "abstract" => $abstract, "id" => $id];
-    $this->fetchSQL($sql, $params);
-    return null;
+        $sql = "UPDATE articles SET title = :title, abstract = :abstract WHERE id = :id";
+        $params = ["title" => $title, "abstract" => $abstract, "id" => $id];
+        $this->fetchSQL($sql, $params);
+
+        return null;
+    }
+
+    function postArticle(string $title, string $abstract, string $file): null | ApiError {
+        if ($title == null || $abstract == null || $file == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
+        if ($this->currentUser() == null) return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "INSERT INTO articles (title, abstract, file, author) values (:title, :abstract, :file, :author)";
+        $params = [
+            "title" => $title,
+            "abstract" => $abstract,
+            "file" => $file,
+            "author" => $this->currentUser()->id
+        ];
+        $this->fetchSQL($sql, $params);
+
+        return null;
     }
 }
 
@@ -187,6 +209,7 @@ class User {
     public string $name;
     public Role $role;
     public bool $enabled;
+    public int $id;
 
     function __construct($data)
     {
@@ -195,6 +218,7 @@ class User {
         $this->name = $data['name'];
         $this->role = Role::from(intval($data['role']));
         $this->enabled = boolval($data['enabled']);
+        $this->id = intval($data['id']);
     }
 }
 
