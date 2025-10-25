@@ -182,6 +182,15 @@ class API {
 
         return null;
     }
+
+    function listArticles(): array | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN->value)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT * FROM articles";
+        $params = [];
+        return $this->fetchSQL($sql, $params);
+    }
 }
 
 enum Role: int

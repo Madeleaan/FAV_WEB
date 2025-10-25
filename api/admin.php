@@ -9,6 +9,9 @@ if ($method == 'GET') {
         case 'list-users':
             listUsers();
             break;
+        case 'list-articles':
+            listArticles();
+            break;
         default:
             error(new ApiError(ApiErrorList::BAD_TASK));
     }
@@ -63,4 +66,14 @@ function changeRole(string $login, string $role): void {
     $res = $api->changeRole($login, $role);
     if ($res != null) error($res);
     else echo json_encode(["status" => 200]);
+}
+
+function listArticles(): void {
+    $api = new API();
+    $articles = $api->listArticles();
+    if (is_array($articles)) {
+        echo json_encode($api->listArticles());
+    } else {
+        error($articles);
+    }
 }

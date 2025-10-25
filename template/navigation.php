@@ -36,6 +36,9 @@
                             <li><a class="dropdown-item" href="/admin/usercontrol">
                                 <i class="fas fa-users me-1"></i>Správa uživatelů
                             </a></li>
+                            <li><a class="dropdown-item" href="/admin/articles">
+                                    <i class="fas fa-list-ol me-1"></i>Správa článků
+                                </a></li>
                         <?php endif ?>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" id="logoutBtn">
