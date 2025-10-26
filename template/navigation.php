@@ -28,11 +28,12 @@
                         <li><a class="dropdown-item">
                             <i class="fas fa-medal me-1"></i>Role: <?php echo Role::str($user->role) ?></a>
                         </a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <?php if ($user->role == Role::AUTHOR): ?>
                             <li><a class="dropdown-item" href="/author/articles">
                                 <i class="fas fa-newspaper me-1"></i>Moje články
                             </a></li>
-                        <?php elseif ($user->role >= Role::ADMIN): ?>
+                        <?php elseif ($user->role->value >= Role::ADMIN->value): ?>
                             <li><a class="dropdown-item" href="/admin/usercontrol">
                                 <i class="fas fa-users me-1"></i>Správa uživatelů
                             </a></li>
@@ -45,7 +46,7 @@
                             <i class="fas fa-right-from-bracket me-1"></i>Odhlásit
                         </a></li>
                         <script>
-                            $('#logoutBtn').click(() => {
+                            $('#logoutBtn').on('click', () => {
                                 $.post("/api/logout", () => location.reload())
                             })
                         </script>

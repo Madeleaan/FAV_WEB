@@ -30,6 +30,10 @@ if ($method == 'GET') {
             if (empty($input['login']) || empty($input['role'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
             changeRole($input['login'], $input['role']);
             break;
+        case 'add-editor':
+            if (empty($input['article']) || empty($input['editor'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
+            addEditor($input['article'], $input['editor']);
+            break;
         default:
             error(new ApiError(ApiErrorList::BAD_TASK));
     }
@@ -76,4 +80,11 @@ function listArticles(): void {
     } else {
         error($articles);
     }
+}
+
+function addEditor(int $article, int $editor): void {
+    $api = new API();
+    $res = $api->addEditor($article, $editor);
+    if ($res != null) error($res);
+    else echo json_encode(["status" => 200]);
 }

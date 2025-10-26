@@ -10,23 +10,23 @@
 <body>
 <?php include 'template/navigation.php' ?>
 <div class="mx-2 mx-md-4">
+    <h2 class="text-center">Moje články</h2>
     <?php
     $api = new API();
     $user = $api->currentUser();
     if ($user != null && $user->role == Role::AUTHOR): $articles = $api->getUserArticles($user->login); ?>
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#newModal"><i class="fas fa-newspaper me-1"></i>Přidat nový článek</button>
+    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newModal"><i class="fas fa-circle-plus me-1"></i>Přidat nový článek</button>
     <ul class="list-group gap-3">
         <?php foreach ($articles as $article): ?>
         <div class="card" data-article="<?=$article->id;?>">
             <div class="card-body">
-                <div class="d-flex">
+                <div class="d-flex gap-4 mb-2">
                     <div class="me-auto">
                         <h5 class="card-title text-decoration-underline mb-2"><?=$article->title?></h5>
-                        <h6 class="card-subtitle mb-2 text-body-secondary"><i class="fas fa-calendar-days"></i> <?=$article->date->format('d.m.Y')?></h6>
                     </div>
                     <div class="btn-group ms-auto mb-auto">
                         <button type="button" class="btn btn-warning" data-view-file="<?=$article->file?>"><i class="fas fa-eye me-1"></i>Zobrazit</button>
-                        <button type="button" class="btn btn-primary"
+                        <button type="button" class="btn btn-primary mx-1"
                                 data-bs-toggle="modal" data-bs-target="#editModal" <?php if ($article->public) echo "disabled"?>>
                             <i class="fas fa-pencil me-1"></i>Upravit</button>
                         <button type="button" class="btn btn-outline-danger"
@@ -34,6 +34,7 @@
                             <i class="fas fa-trash me-1"></i>Vymazat</button>
                     </div>
                 </div>
+                <h6 class="card-subtitle mb-2 text-body-secondary"><i class="fas fa-calendar-days"></i> <?=$article->date->format('d.m.Y')?></h6>
                 <div class="card-text">
                     <b>Abstrakt: </b>
                     <div class="abstract"><?=$article->abstract?></div>

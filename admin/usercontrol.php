@@ -74,7 +74,7 @@
 
         let admin;
         await $.get(
-            `/api/user?login=${$('#userDropdown').text().trim()}`,
+            `/api/user?login=<?= $api->currentUser()->login?>`,
             (data) => admin = data
         )
 
@@ -104,7 +104,7 @@
                     width: '10%',
                     render: (data, type, row, meta) => {
                         if (type !== 'display') return data
-                        if (row.login === admin.login) return `<b>${roles[data]}</b>`
+                        if (row.role >= admin.role) return `<b>${roles[data]}</b>`
 
                         let html = `<select class="form-select roleSelect w-auto ms-auto" aria-label="Role select"
                             data-action="change" data-login="${row.login}" data-row=${meta.row}>`

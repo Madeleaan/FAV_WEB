@@ -20,6 +20,7 @@ enum ApiErrorList {
     case NO_ACCESS;
     case ARTICLE_PUBLIC;
     case BAD_FILE;
+    case REVIEW_EXISTS;
 }
 
 class ApiError extends Exception {
@@ -37,6 +38,7 @@ class ApiError extends Exception {
             ApiErrorList::NO_ACCESS => parent::__construct('No access', 403),
             ApiErrorList::ARTICLE_PUBLIC => parent::__construct('Article is public, cant edit or delete it', 403),
             ApiErrorList::BAD_FILE => parent::__construct('Submitted file is in a bad format', 400),
+            ApiErrorList::REVIEW_EXISTS => parent::__construct('Review already exists', 400),
         };
     }
 }

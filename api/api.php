@@ -18,14 +18,16 @@ class API {
         $this->pdo = $pdo;
     }
 
-    function fetchSQL(string $sql, array $params): array | null {
+    function fetchSQL(string $sql, array $params, bool $all = false): array | null {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
         if ($stmt->rowCount() == 0) return null;
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (count($res) == 1) return $res[0];
-        else return $res;
+
+        if ($all) return $res;
+        else if ($res == []) return [];
+        else return $res[0];
     }
 
     function createUser(string $login, string $pass, string $name): null | ApiError {
@@ -33,7 +35,8 @@ class API {
 
         $sql = "INSERT INTO users (login, password, name) VALUES (:login, :pass, :name)";
         $params = ["login" => $login, "pass" => password_hash($pass, PASSWORD_DEFAULT), "name" => $name];
-        return $this->fetchSQL($sql, $params) != null ? null : new APIError(ApiErrorList::DB_ERROR);
+        $this->fetchSQL($sql, $params);
+        return null;
     }
 
     function loginUser(string $login, string $pass): null | ApiError {
@@ -51,8 +54,18 @@ class API {
 
     function getUser(string $login): User | ApiError {
         $sql = "SELECT * FROM users WHERE login = :login";
-        $params = ["login" => $login];
-        $data = $this->fetchSQL($sql, $params);
+        $data = $this->fetchSQL($sql, ["login" => $login]);
+
+        if ($data == null) return new ApiError(ApiErrorList::BAD_LOGIN);
+        else {
+            return new User($data);
+        }
+    }
+
+    function getUserFromId(int $id): User | ApiError {
+        $sql = "SELECT * FROM users WHERE id = :id";
+        $data = $this->fetchSQL($sql, ["id" => $id]);
+
         if ($data == null) return new ApiError(ApiErrorList::BAD_LOGIN);
         else {
             return new User($data);
@@ -67,8 +80,8 @@ class API {
         if ($this->currentUser()->role->value <= $user->role->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $sql = "UPDATE users SET enabled = :enabled WHERE login = :login";
-        $params = ["enabled" => $user->enabled ? 0 : 1, "login" => $login];
-        $this->fetchSQL($sql, $params);
+        $this->fetchSQL($sql, ["enabled" => $user->enabled ? 0 : 1, "login" => $login]);
+
         return null;
     }
 
@@ -80,8 +93,8 @@ class API {
         if ($this->currentUser()->role->value <= $user->role->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $sql = "DELETE FROM users WHERE login = :login";
-        $params = ["login" => $login];
-        $this->fetchSQL($sql, $params);
+        $this->fetchSQL($sql, ["login" => $login]);
+
         return null;
     }
 
@@ -94,8 +107,8 @@ class API {
         if ($this->currentUser()->role->value <= $role) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $sql = "UPDATE users SET role = :role WHERE login = :login";
-        $params = ["role" => $role, "login" => $login];
-        $this->fetchSQL($sql, $params);
+        $this->fetchSQL($sql, ["role" => $role, "login" => $login]);
+
         return null;
     }
 
@@ -103,7 +116,8 @@ class API {
         if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $sql = "SELECT * FROM users";
-        $data = $this->fetchSQL($sql, []);
+        $data = $this->fetchSQL($sql, [], true);
+
         $res = [];
         foreach ($data as $user) $res[] = new User($user);
         return $res;
@@ -124,8 +138,8 @@ class API {
         $sql = "SELECT a.* FROM articles a
             JOIN users u ON u.id = a.author WHERE login = :login
             ORDER BY a.date DESC";
-        $params = ['login' => $login];
-        $data = $this->fetchSQL($sql, $params);
+        $data = $this->fetchSQL($sql, ['login' => $login], true);
+
         $res = [];
         foreach ($data as $article) $res[] = new Article($article);
         return $res;
@@ -136,13 +150,12 @@ class API {
 
         $sql = "SELECT login, public, file FROM articles a 
                     JOIN users u ON u.id = a.author WHERE a.id = :id";
-        $params = ["id" => $id];
-        $data = $this->fetchSQL($sql, $params);
+        $data = $this->fetchSQL($sql, ["id" => $id]);
         if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
         if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
 
         $sql = "DELETE FROM articles WHERE id = :id";
-        $this->fetchSQL($sql, $params);
+        $this->fetchSQL($sql, ["id" => $id]);
 
         $dir = "../storage/articles/";
         unlink($dir . $data['file']);
@@ -155,8 +168,7 @@ class API {
 
         $sql = "SELECT login, public FROM articles a
                     JOIN users u ON u.id = a.author WHERE a.id = :id";
-        $params = ["id" => $id];
-        $data = $this->fetchSQL($sql, $params);
+        $data = $this->fetchSQL($sql, ["id" => $id]);
         if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
         if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
 
@@ -187,9 +199,58 @@ class API {
         if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN->value)
             return new ApiError(ApiErrorList::NO_ACCESS);
 
-        $sql = "SELECT * FROM articles";
-        $params = [];
-        return $this->fetchSQL($sql, $params);
+        $sql = "SELECT * FROM articles ORDER BY date DESC";
+        $data =  $this->fetchSQL($sql, [], true);
+
+        $res = [];
+        foreach ($data as $article) $res[] = new Article($article);
+        return $res;
+    }
+
+    function listAvailableEditors(int $article): array | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT * FROM users WHERE role = 2 AND id NOT IN (SELECT editor from reviews WHERE article = :article) AND enabled = 1";
+        $data = $this->fetchSQL($sql, ["article" => $article], true);
+
+        $res = [];
+        if ($data != null) {
+            foreach ($data as $user) $res[] = new User($user);
+        }
+        return $res;
+    }
+
+    function getReviews(int $article): array | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT * FROM reviews WHERE article = :article";
+        $data = $this->fetchSQL($sql, ["article" => $article], true);
+
+        $res = [];
+        if ($data != null) {
+            foreach ($data as $review) $res[] = new Review($review);
+        }
+        return $res;
+    }
+
+    function addEditor(int $article, int $editor): null | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT * FROM users WHERE role = 2 AND id = :editor AND enabled = 1";
+        $data = $this->fetchSQL($sql, ['editor' => $editor]);
+        if ($data == null) return new ApiError(ApiErrorList::BAD_LOGIN);
+
+        $sql = "SELECT * FROM reviews WHERE article = :article AND editor = :editor";
+        $data = $this->fetchSQL($sql, ["article" => $article, "editor" => $editor]);
+        if ($data != null) return new ApiError(ApiErrorList::REVIEW_EXISTS);
+
+        $sql = "INSERT INTO reviews (article, editor) VALUES (:article, :editor)";
+        $this->fetchSQL($sql, ['article' => $article, 'editor' => $editor]);
+
+        return null;
     }
 }
 
@@ -238,6 +299,7 @@ class Article {
     public string $abstract;
     public string $file;
     public bool $public;
+    public string $status;
 
     function __construct($data) {
         $this->id = $data["id"];
@@ -246,6 +308,25 @@ class Article {
         $this->abstract = $data['abstract'];
         $this->file = $data['file'];
         $this->public = boolval($data['public']);
+        $this->status = $data['status'];
+    }
+}
+
+class Review {
+    public int $id;
+    public int $article;
+    public int $editor;
+    public float $quality;
+    public float $language;
+    public float $relevancy;
+
+    function __construct($data) {
+        $this->id = $data["id"];
+        $this->article = $data["article"];
+        $this->editor = $data["editor"];
+        $this->quality = $data["quality"];
+        $this->language = $data["language"];
+        $this->relevancy = $data["relevancy"];
     }
 }
 
