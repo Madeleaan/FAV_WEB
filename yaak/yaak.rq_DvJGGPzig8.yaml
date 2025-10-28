@@ -1,0 +1,28 @@
+type: http_request
+model: http_request
+id: rq_DvJGGPzig8
+createdAt: 2025-10-27T12:28:48.029903308
+updatedAt: 2025-10-27T12:42:58.520791704
+workspaceId: wk_9qiF4PkEVM
+folderId: fl_nFBf49zi9M
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "login": "<>!",
+      "name": "${[ faker.person.fullName() ]}",
+      "password": "${[ faker.internet.password() ]}"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: JC43BJnMmh
+method: POST
+name: Register a user
+sortPriority: 0.0
+url: localhost/api/register
+urlParameters: []

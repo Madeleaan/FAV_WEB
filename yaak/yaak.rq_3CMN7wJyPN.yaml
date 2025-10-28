@@ -1,0 +1,28 @@
+type: http_request
+model: http_request
+id: rq_3CMN7wJyPN
+createdAt: 2025-10-28T09:50:38.505186810
+updatedAt: 2025-10-28T12:24:38.141387326
+workspaceId: wk_9qiF4PkEVM
+folderId: fl_vqrcdGCvjH
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "task": "add-editor",
+      "article": 2,
+      "editor": 172
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: t8InHfWDHi
+method: POST
+name: Asign editor
+sortPriority: 0.0
+url: localhost/api/admin
+urlParameters: []

@@ -1,5 +1,7 @@
 <?php
-session_start();
+session_start([
+    'cookie_httponly' => true,
+]);
 include ('api/error.php');
 
 class API {
@@ -148,11 +150,11 @@ class API {
     function deleteArticle(int $id): null | ApiError {
         if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
 
-        $sql = "SELECT login, public, file FROM articles a 
+        $sql = "SELECT login, status, file FROM articles a 
                     JOIN users u ON u.id = a.author WHERE a.id = :id";
         $data = $this->fetchSQL($sql, ["id" => $id]);
         if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
-        if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
+        if ($data['status'] == 'accepted') return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
 
         $sql = "DELETE FROM articles WHERE id = :id";
         $this->fetchSQL($sql, ["id" => $id]);
@@ -166,11 +168,11 @@ class API {
     function updateArticle(int $id, string $title, string $abstract): null | ApiError {
         if ($id == null) return new ApiError(ApiErrorList::MISSING_PARAMS);
 
-        $sql = "SELECT login, public FROM articles a
+        $sql = "SELECT login, status FROM articles a
                     JOIN users u ON u.id = a.author WHERE a.id = :id";
         $data = $this->fetchSQL($sql, ["id" => $id]);
         if ($data == null || $data['login'] != $this->currentUser()->login) return new ApiError(ApiErrorList::NO_ACCESS);
-        if ($data['public']) return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
+        if ($data['status'] == 'accepted') return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
 
         $sql = "UPDATE articles SET title = :title, abstract = :abstract WHERE id = :id";
         $params = ["title" => $title, "abstract" => $abstract, "id" => $id];
@@ -249,6 +251,31 @@ class API {
 
         $sql = "INSERT INTO reviews (article, editor) VALUES (:article, :editor)";
         $this->fetchSQL($sql, ['article' => $article, 'editor' => $editor]);
+
+        return null;
+    }
+
+    function deleteReview(int $review): null | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "DELETE FROM reviews WHERE id = :id";
+        $this->fetchSQL($sql, ["id" => $review]);
+
+        return null;
+    }
+
+    function acceptArticle(int $article, string $accept): null | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT id FROM reviews WHERE article = :id";
+        $data = $this->fetchSQL($sql, ["id" => $article], true);
+
+        if (sizeof($data) < 3) return new ApiError(ApiErrorList::NO_REVIEWS);
+
+        $sql = "UPDATE articles SET status = :status WHERE id = :id";
+        $this->fetchSQL($sql, ["id" => $article, "status" => ($accept == 'true') ? 'accepted' : 'denied']);
 
         return null;
     }
@@ -336,6 +363,7 @@ if (!empty($_SESSION['login'])) {
     $user = $api->getUser($_SESSION['login']);
     if ($user instanceof ApiError || !$user->enabled) {
         $_SESSION['login'] = null;
+        session_destroy();
         header("Refresh: 0");
     }
 }

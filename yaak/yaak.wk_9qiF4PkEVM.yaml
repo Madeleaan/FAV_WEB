@@ -1,0 +1,14 @@
+type: workspace
+model: workspace
+id: wk_9qiF4PkEVM
+createdAt: 2025-10-27T10:49:11.007723520
+updatedAt: 2025-10-27T11:40:18.704310655
+authentication: {}
+authenticationType: none
+description: Api testing of the KIV/WEB semester project
+headers: []
+name: KIV/WEB
+encryptionKeyChallenge: null
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0

@@ -34,6 +34,14 @@ if ($method == 'GET') {
             if (empty($input['article']) || empty($input['editor'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
             addEditor($input['article'], $input['editor']);
             break;
+        case 'delete-review':
+            if (empty($input['id'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
+            deleteReview($input['id']);
+            break;
+        case 'accept-article':
+            if (empty($input['id']) || empty($input['accept'])) error(new ApiError(ApiErrorList::MISSING_PARAMS));
+            acceptArticle($input['id'], $input['accept']);
+            break;
         default:
             error(new ApiError(ApiErrorList::BAD_TASK));
     }
@@ -85,6 +93,20 @@ function listArticles(): void {
 function addEditor(int $article, int $editor): void {
     $api = new API();
     $res = $api->addEditor($article, $editor);
+    if ($res != null) error($res);
+    else echo json_encode(["status" => 200]);
+}
+
+function deleteReview(int $id): void {
+    $api = new API();
+    $res = $api->deleteReview($id);
+    if ($res != null) error($res);
+    else echo json_encode(["status" => 200]);
+}
+
+function acceptArticle(int $id, string $accept): void {
+    $api = new API();
+    $res = $api->acceptArticle($id, $accept);
     if ($res != null) error($res);
     else echo json_encode(["status" => 200]);
 }

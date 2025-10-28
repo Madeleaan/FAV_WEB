@@ -11,6 +11,11 @@ if ($method == 'POST') {
         error(new ApiError(ApiErrorList::WEAK_PASSWORD));
     }
 
+    $exp = "/\w+/";
+    if (!preg_match($exp, $input['login'])) {
+        error(new ApiError(ApiErrorList::ILLEGAL_LOGIN));
+    }
+
     $api = new Api();
     $res = $api->createUser($input['login'], $input['password'], $input['name']);
     if ($res != null) {

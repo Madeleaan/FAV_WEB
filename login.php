@@ -61,7 +61,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
                             <label for="register-login" class="form-label">Uživatelské jméno</label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                <input type="text" class="form-control" id="register-login" name="login" required>
+                                <input type="text" class="form-control" id="register-login" name="login" pattern="\w+" required>
                                 <div class="invalid-feedback" id="register-login-feedback">Uživatelské již existuje!</div>
                             </div>
                         </div>
@@ -150,7 +150,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
         return isValid
     }
 
-    $("#register-form").submit((e) => {
+    $("#register-form").on('submit', (e) => {
         e.preventDefault()
         $("input").each((_, el) => el.classList.remove('is-invalid'))
         if(validatePassword()) {

@@ -4,9 +4,9 @@
     <title>Title</title> <!-- TODO branding -->
 
     <?php include('../template/commonhead.php') ?>
-    <link rel="stylesheet" href="../node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
-    <script src="../node_modules/datatables.net/js/dataTables.min.js"></script>
-    <script src="../node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="/node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <script src="/node_modules/datatables.net/js/dataTables.min.js"></script>
+    <script src="/node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
 </head>
 <body>
 <?php include '../template/navigation.php' ?>

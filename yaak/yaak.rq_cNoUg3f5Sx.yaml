@@ -1,0 +1,28 @@
+type: http_request
+model: http_request
+id: rq_cNoUg3f5Sx
+createdAt: 2025-10-27T12:56:20.414207159
+updatedAt: 2025-10-28T12:24:38.148789763
+workspaceId: wk_9qiF4PkEVM
+folderId: fl_vqrcdGCvjH
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "task": "accept-article",
+      "id": 1,
+      "accept": "true"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: UPxTBHaRGm
+method: POST
+name: Accept article
+sortPriority: 1000.0
+url: localhost/api/admin
+urlParameters: []

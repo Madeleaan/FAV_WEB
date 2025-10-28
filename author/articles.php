@@ -15,14 +15,30 @@
     $api = new API();
     $user = $api->currentUser();
     if ($user != null && $user->role == Role::AUTHOR): $articles = $api->getUserArticles($user->login); ?>
-    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newModal"><i class="fas fa-circle-plus me-1"></i>Přidat nový článek</button>
+    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newModal">
+        <i class="fas fa-circle-plus me-1"></i>Přidat nový článek
+    </button>
+
     <ul class="list-group gap-3">
         <?php foreach ($articles as $article): ?>
         <div class="card" data-article="<?=$article->id;?>">
             <div class="card-body">
                 <div class="d-flex gap-4 mb-2">
                     <div class="me-auto">
-                        <h5 class="card-title text-decoration-underline mb-2"><?=$article->title?></h5>
+                        <?php switch($article->status):
+                            case 'waiting': ?>
+                                <span class="badge text-bg-info">Hodnocený</span>
+                                <?php break;
+                            case 'accepted': ?>
+                                <span class="badge text-bg-success">Akceptovaný</span>
+                                <?php break;
+                            case 'denied': ?>
+                                <span class="badge text-bg-danger">Zamítnutý</span>
+                                <?php break;
+                            default: ?>
+                                <span class="badge text-bg-secondary">Neznámý status</span>
+                            <?php endswitch ?>
+                        <h5 class="card-title text-decoration-underline my-2"><?=htmlspecialchars($article->title)?></h5>
                     </div>
                     <div class="btn-group ms-auto mb-auto">
                         <button type="button" class="btn btn-warning" data-view-file="<?=$article->file?>"><i class="fas fa-eye me-1"></i>Zobrazit</button>
@@ -40,7 +56,7 @@
                     <div class="abstract"><?=$article->abstract?></div>
                 </div>
             </div>
-        <iframe class="w-100 vh-100 d-none" src="../storage/articles/<?=$article->file?>"></iframe>
+        <iframe class="w-100 vh-100 d-none" src="/storage/articles/<?=$article->file?>"></iframe>
         </div>
         <?php endforeach ?>
     </ul>
