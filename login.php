@@ -62,7 +62,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
                             <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 <input type="text" class="form-control" id="register-login" name="login" pattern="\w+" required>
-                                <div class="invalid-feedback" id="register-login-feedback">Uživatelské již existuje!</div>
+                                <div class="invalid-feedback" id="register-login-feedback">Uživatelské jméno již existuje!</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -124,8 +124,8 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
             },
             error: (data) => {
                 let msg = JSON.parse(data.responseText)
-                if (msg.error === 400) $("#login-login").addClass('is-invalid')
-                else if (msg.error === 403) $("#login-pass").addClass('is-invalid')
+                if (msg.code === 'BAD_LOGIN') $("#login-login").addClass('is-invalid')
+                else if (msg.code === 'BAD_PASS') $("#login-pass").addClass('is-invalid')
             }
         })
     })
@@ -157,8 +157,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
             let formData = $("#register-form").serializeArray()
             let postData = {}
             $.each(formData, (k, v) => postData[v.name] = v.value)
-            $.
-            ajax({
+            $.ajax({
                 url: '/api/register',
                 type: 'POST',
                 data: JSON.stringify(postData),
@@ -167,7 +166,7 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
                 success: () => location.reload(),
                 error: (data) => {
                     let msg = JSON.parse(data.responseText)
-                    if (msg.error === 'LOGIN_EXISTS') $("#register-login").addClass('is-invalid')
+                    if (msg.code === 'LOGIN_EXISTS') $("#register-login").addClass('is-invalid')
                 }
             })
         }

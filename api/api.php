@@ -75,7 +75,7 @@ class API {
     }
 
     function toggleUser(string $login): null | ApiError {
-        if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $user = $this->getUser($login);
         if ($user instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
@@ -88,7 +88,7 @@ class API {
     }
 
     function deleteUser(string $login): null | ApiError {
-        if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $user = $this->getUser($login);
         if ($user instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
@@ -101,7 +101,7 @@ class API {
     }
 
     function changeRole(string $login, int $role): null | ApiError {
-        if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $user = $this->getUser($login);
         if ($user instanceof ApiError) return new ApiError(ApiErrorList::BAD_LOGIN);
@@ -115,7 +115,7 @@ class API {
     }
 
     function listUsers(): array | ApiError {
-        if ($this->currentUser() == null || $this->currentUser()->role->value < 3) return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($this->currentUser() == null || $this->currentUser()->role->value < Role::ADMIN->value) return new ApiError(ApiErrorList::NO_ACCESS);
 
         $sql = "SELECT * FROM users";
         $data = $this->fetchSQL($sql, [], true);
@@ -362,7 +362,6 @@ if (!empty($_SESSION['login'])) {
     $api = new API();
     $user = $api->getUser($_SESSION['login']);
     if ($user instanceof ApiError || !$user->enabled) {
-        $_SESSION['login'] = null;
         session_destroy();
         header("Refresh: 0");
     }

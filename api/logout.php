@@ -8,6 +8,5 @@ if ($method == 'POST') {
 }
 
 function logout(): void {
-    $_SESSION['login'] = null;
     session_destroy();
 }

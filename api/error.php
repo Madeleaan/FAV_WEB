@@ -3,7 +3,7 @@
 function error(ApiError $error): void
 {
     http_response_code($error->getCode());
-    echo json_encode(["msg" => $error->getMessage(), "error" => $error->getCode()]);
+    echo json_encode(["msg" => $error->getMessage(), "error" => $error->getCode(), "code" => $error->getError()->name]);
     die();
 }
 
@@ -26,7 +26,9 @@ enum ApiErrorList {
 }
 
 class ApiError extends Exception {
+    private ApiErrorList $err;
     function __construct(ApiErrorList $error) {
+        $this->err = $error;
         match ($error) {
             ApiErrorList::BAD_METHOD => parent::__construct('Unsupported method', 405),
             ApiErrorList::MISSING_PARAMS => parent::__construct('Some parameters are missing', 400),
@@ -45,4 +47,6 @@ class ApiError extends Exception {
             ApiErrorList::NO_REVIEWS => parent::__construct('Article does not have enough reviews', 400),
         };
     }
+
+    function getError(): ApiErrorList { return $this->err; }
 }
