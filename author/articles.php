@@ -27,7 +27,7 @@
                     <div class="me-auto">
                         <?php switch($article->status):
                             case 'waiting': ?>
-                                <span class="badge text-bg-info">Hodnocený</span>
+                                <span class="badge text-bg-info">Čeká na hodnocení</span>
                                 <?php break;
                             case 'accepted': ?>
                                 <span class="badge text-bg-success">Akceptovaný</span>
@@ -43,10 +43,11 @@
                     <div class="btn-group ms-auto mb-auto">
                         <button type="button" class="btn btn-warning" data-view-file="<?=$article->file?>"><i class="fas fa-eye me-1"></i>Zobrazit</button>
                         <button type="button" class="btn btn-primary mx-1"
-                                data-bs-toggle="modal" data-bs-target="#editModal" <?php if ($article->public) echo "disabled"?>>
+                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                <?php if ($article->status == 'accepted' || $article->status == 'denied') echo "disabled"?>>
                             <i class="fas fa-pencil me-1"></i>Upravit</button>
-                        <button type="button" class="btn btn-outline-danger"
-                                data-delete="<?=$article->id?>" <?php if ($article->public) echo "disabled"?>>
+                        <button type="button" class="btn btn-outline-danger" data-delete="<?=$article->id?>"
+                                <?php if ($article->status == 'accepted' || $article->status == 'denied') echo "disabled"?>>
                             <i class="fas fa-trash me-1"></i>Vymazat</button>
                     </div>
                 </div>

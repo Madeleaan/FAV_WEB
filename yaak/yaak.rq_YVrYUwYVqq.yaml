@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_YVrYUwYVqq
 createdAt: 2025-10-27T11:01:48.155045608
-updatedAt: 2025-10-27T12:42:58.535761487
+updatedAt: 2025-10-31T08:10:31.073093170
 workspaceId: wk_9qiF4PkEVM
 folderId: fl_nFBf49zi9M
 authentication: {}
@@ -22,6 +22,6 @@ headers:
   id: aQsVwQzdGA
 method: POST
 name: Login as admin
-sortPriority: 1000.0
+sortPriority: 2000.0
 url: localhost/api/login
 urlParameters: []

@@ -279,6 +279,54 @@ class API {
 
         return null;
     }
+
+    function getUserReviews(int $user): array | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role != Role::EDITOR)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT * FROM reviews WHERE editor = :editor";
+        $data = $this->fetchSQL($sql, ["editor" => $user], true);
+
+        $res = [];
+        if ($data != null) {
+            foreach ($data as $review) $res[] = new Review($review);
+        }
+        return $res;
+    }
+
+    function getArticle(int $id): Article | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role != Role::EDITOR)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        $sql = "SELECT * FROM articles WHERE id = :id";
+        $data = $this->fetchSQL($sql, ["id" => $id]);
+
+        return new Article($data);
+    }
+
+    function addReview(int $id, float $quality, float $language, float $relevancy): null | ApiError {
+        if ($this->currentUser() == null || $this->currentUser()->role != Role::EDITOR)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+
+        if ($quality < 1 || $quality > 5 || $language < 1 || $language > 5 || $relevancy < 1 || $relevancy > 5)
+            return new ApiError(ApiErrorList::BAD_SCORING);
+
+        $sql = "SELECT editor, article FROM reviews WHERE id = :id";
+        $data = $this->fetchSQL($sql, ["id" => $id]);
+
+        if ($data == null || $data['editor'] != $this->currentUser()->id)
+            return new ApiError(ApiErrorList::NO_ACCESS);
+        if ($this->getArticle($data['article'])->status != 'waiting')
+            return new ApiError(ApiErrorList::ARTICLE_PUBLIC);
+
+        $quality = $quality - fmod($quality, 0.5);
+        $language = $language - fmod($language, 0.5);
+        $relevancy = $relevancy - fmod($relevancy, 0.5);
+        $sql = "UPDATE reviews SET quality = :quality, language = :language, relevancy = :relevancy WHERE id = :id";
+        $this->fetchSQL($sql, ["quality" => $quality, "language" => $language, "relevancy" => $relevancy, "id" => $id]);
+
+        return null;
+    }
 }
 
 enum Role: int
@@ -325,7 +373,6 @@ class Article {
     public DateTime $date;
     public string $abstract;
     public string $file;
-    public bool $public;
     public string $status;
 
     function __construct($data) {
@@ -334,7 +381,6 @@ class Article {
         $this->date = new DateTime($data['date']);
         $this->abstract = $data['abstract'];
         $this->file = $data['file'];
-        $this->public = boolval($data['public']);
         $this->status = $data['status'];
     }
 }

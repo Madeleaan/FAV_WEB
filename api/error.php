@@ -23,6 +23,7 @@ enum ApiErrorList {
     case REVIEW_EXISTS;
     case ILLEGAL_LOGIN;
     case NO_REVIEWS;
+    case BAD_SCORING;
 }
 
 class ApiError extends Exception {
@@ -45,6 +46,7 @@ class ApiError extends Exception {
             ApiErrorList::REVIEW_EXISTS => parent::__construct('Review already exists', 400),
             ApiErrorList::ILLEGAL_LOGIN => parent::__construct('Illegal characters in login', 400),
             ApiErrorList::NO_REVIEWS => parent::__construct('Article does not have enough reviews', 400),
+            ApiErrorList::BAD_SCORING => parent::__construct('Review scoring must be between 1 and 5', 400)
         };
     }
 
