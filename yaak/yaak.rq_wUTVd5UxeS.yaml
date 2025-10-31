@@ -1,17 +1,19 @@
 type: http_request
 model: http_request
-id: rq_YVrYUwYVqq
-createdAt: 2025-10-27T11:01:48.155045608
-updatedAt: 2025-10-31T08:10:31.073093170
+id: rq_wUTVd5UxeS
+createdAt: 2025-10-31T07:53:05.494523616
+updatedAt: 2025-10-31T08:11:15.457591725
 workspaceId: wk_9qiF4PkEVM
-folderId: fl_nFBf49zi9M
+folderId: fl_vqrcdGCvjH
 authentication: {}
 authenticationType: null
 body:
   text: |-
     {
-      "login": "admin",
-      "password": "admin1"
+      "id": 97,
+      "quality": 3,
+      "language": 3,
+      "relevancy": 3
     }
 bodyType: application/json
 description: ''
@@ -19,9 +21,9 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: aQsVwQzdGA
+  id: DrT6MBiYx3
 method: POST
-name: Login as admin
-sortPriority: 2000.0
-url: localhost/api/login
+name: Post review
+sortPriority: -0.0001
+url: localhost/api/review
 urlParameters: []

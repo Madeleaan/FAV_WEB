@@ -1,4 +1,7 @@
 <?php
+
+use Random\RandomException;
+
 $method = $_SERVER['REQUEST_METHOD'];
 header("Content-Type: application/json");
 $input = json_decode(file_get_contents('php://input'), true);
@@ -72,6 +75,9 @@ function updateArticle(array $input): void {
     }
 }
 
+/**
+ * @throws RandomException
+ */
 function postArticle(array $input, array $file): void {
     $dir = "../storage/articles/";
     do {

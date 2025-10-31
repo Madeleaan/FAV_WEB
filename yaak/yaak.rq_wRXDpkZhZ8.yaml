@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_DvJGGPzig8
-createdAt: 2025-10-27T12:28:48.029903308
-updatedAt: 2025-10-31T08:10:31.053807989
+id: rq_wRXDpkZhZ8
+createdAt: 2025-10-31T08:10:38.679656371
+updatedAt: 2025-10-31T08:12:47.211195825
 workspaceId: wk_9qiF4PkEVM
 folderId: fl_nFBf49zi9M
 authentication: {}
@@ -10,9 +10,8 @@ authenticationType: null
 body:
   text: |-
     {
-      "login": "<>!",
-      "name": "${[ faker.person.fullName() ]}",
-      "password": "${[ faker.internet.password() ]}"
+      "login": "editor1",
+      "password": "editor"
     }
 bodyType: application/json
 description: ''
@@ -20,9 +19,9 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: JC43BJnMmh
+  id: aQsVwQzdGA
 method: POST
-name: Register a user
-sortPriority: 0.0
-url: localhost/api/register
+name: Login as editor
+sortPriority: 2000.0011
+url: localhost/api/login
 urlParameters: []
