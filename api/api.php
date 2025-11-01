@@ -327,6 +327,20 @@ class API {
 
         return null;
     }
+
+    /**
+     * @return Article[]
+     */
+    function getPublicArticles(): array {
+        $sql = "SELECT * FROM articles WHERE status = 'accepted'";
+        $data = $this->fetchSQL($sql, [], true);
+
+        $res = [];
+        if ($data != null) {
+            foreach ($data as $review) $res[] = new Article($review);
+        }
+        return $res;
+    }
 }
 
 enum Role: int
@@ -374,14 +388,18 @@ class Article {
     public string $abstract;
     public string $file;
     public string $status;
+    public User $author;
 
     function __construct($data) {
+        $api = new API();
+
         $this->id = $data["id"];
         $this->title = $data['title'];
         $this->date = new DateTime($data['date']);
         $this->abstract = $data['abstract'];
         $this->file = $data['file'];
         $this->status = $data['status'];
+        $this->author = $api->getUserFromId($data['author']);
     }
 }
 

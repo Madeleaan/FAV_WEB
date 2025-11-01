@@ -110,9 +110,8 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
         let formData = $("#login-form").serializeArray()
         let postData = {}
         $.each(formData, (k, v) => postData[v.name] = v.value)
-        $.ajax({
+        $.post({
             url: '/api/login',
-            type: 'POST',
             data: JSON.stringify(postData),
             processData: false,
             contentType: false,
@@ -157,9 +156,8 @@ if (isset($_SESSION['login'])) header('Location: /') ?>
             let formData = $("#register-form").serializeArray()
             let postData = {}
             $.each(formData, (k, v) => postData[v.name] = v.value)
-            $.ajax({
+            $.post({
                 url: '/api/register',
-                type: 'POST',
                 data: JSON.stringify(postData),
                 processData: false,
                 contentType: false,

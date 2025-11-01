@@ -73,10 +73,10 @@
         }
 
         let admin;
-        await $.get(
-            `/api/user?login=<?= $api->currentUser()->login?>`,
-            (data) => admin = data
-        )
+        await $.get({
+            url: `/api/user?login=<?= $api->currentUser()->login?>`,
+            success: (data) => admin = data
+        })
 
         let table = $('table').DataTable({
             scrollX: true,
@@ -188,30 +188,31 @@
             const row = Number(okBtn.attr('data-row'))
             const action = okBtn.attr('data-action');
             if (['enable', 'disable'].includes(action)) {
-                $.post(
-                    '/api/admin',
-                    JSON.stringify({"task": "toggle-user", "login": login}),
-                    () => {
+                $.post({
+                    url: '/api/admin',
+                    data: JSON.stringify({"task": "toggle-user", "login": login}),
+                    contentType: 'application/json',
+                    success: () => {
                         const cell = table.cell({row: row, column: 3})
                         cell.data(cell.data() === 'true' ? 'false' : 'true').draw()
                     }
-                )
+                })
             } else if (action === 'delete') {
-                $.post(
-                    '/api/admin',
-                    JSON.stringify({"task": "delete-user", "login": login}),
-                    () => {
-                        table.row(row).remove().draw()
-                    }
-                )
+                $.post({
+                    url: '/api/admin',
+                    data: JSON.stringify({"task": "delete-user", "login": login}),
+                    contentType: 'application/json',
+                    success: () => table.row(row).remove().draw()
+                })
             } else {
-                $.post(
-                    '/api/admin',
-                    JSON.stringify({"task": "change-role", "login": login, "role": okBtn.attr('data-role')}),
-                    () => {
+                $.post({
+                    url: '/api/admin',
+                    data: JSON.stringify({"task": "change-role", "login": login, "role": okBtn.attr('data-role')}),
+                    contentType: 'application/json',
+                    success: () => {
                         table.cell({row: row, column: 2}).data(okBtn.attr('data-role')).draw()
                     }
-                )
+                })
             }
         })
     })

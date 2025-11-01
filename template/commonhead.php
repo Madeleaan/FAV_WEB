@@ -6,3 +6,14 @@
 
 <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    body > div {
+        flex: 1;
+    }
+</style>

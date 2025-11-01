@@ -55,6 +55,7 @@ function deleteArticle(): void {
     $api = new API();
     $id = $_GET['id'];
     $res = $api->deleteArticle($id);
+
     if ($res != null) {
         error($res);
     } else {
@@ -68,6 +69,7 @@ function updateArticle(array $input): void {
     $title = $input['title'];
     $abstract = $input['abstract'];
     $res = $api->updateArticle($id, $title, $abstract);
+
     if ($res != null) {
         error($res);
     } else {
@@ -87,5 +89,11 @@ function postArticle(array $input, array $file): void {
     move_uploaded_file($file['tmp_name'], $dir . $filename);
 
     $api = new API();
-    $api->postArticle($input['title'], $input['abstract'], $filename);
+    $res = $api->postArticle($input['title'], $input['abstract'], $filename);
+
+    if ($res != null) {
+        error($res);
+    } else {
+        echo json_encode(["status" => 200]);
+    }
 }

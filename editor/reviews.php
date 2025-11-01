@@ -3,8 +3,6 @@
 <head>
     <title>Title - Recenze</title> <!-- TODO branding -->
 
-    <link rel="stylesheet" href="/node_modules/quill/dist/quill.bubble.css">
-    <script src="/node_modules/quill/dist/quill.js"></script>
     <?php include('template/commonhead.php') ?>
 </head>
 <body>
@@ -99,9 +97,8 @@
         $.post({
             url: '/api/review',
             data: JSON.stringify(postData),
+            contentType: 'application/json',
             success: () => location.reload(),
-            processData: false,
-            contentType: false
         })
     })
 </script>

@@ -67,46 +67,48 @@
                         </div>
                     <?php endif ?>
 
-                    <table class="table table-responsive table-striped table-bordered mt-2">
-                        <thead>
-                        <tr class="align-middle">
-                            <th scope="col" class="w-50">Editor</th>
-                            <th scope="col" class="w-25">Kvalita</th>
-                            <th scope="col" class="w-25">Jazyk</th>
-                            <th scope="col" class="w-25">Relevance</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered mt-2">
+                            <thead>
+                            <tr class="align-middle">
+                                <th scope="col">Editor</th>
+                                <th scope="col">Kvalita</th>
+                                <th scope="col">Jazyk</th>
+                                <th scope="col">Relevance</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
 
-                        <tbody>
-                        <?php if(is_array($reviews)): foreach ($reviews as $review): ?>
-                        <tr class="align-middle">
-                            <th scope="row" data-id="<?= $review->id ?>">
-                                <?=htmlspecialchars($api->getUserFromId($review->editor)->name) ?>
-                            </th>
+                            <tbody>
+                            <?php if(is_array($reviews)): foreach ($reviews as $review): ?>
+                            <tr class="align-middle">
+                                <th scope="row" data-id="<?= $review->id ?>" class="text-nowrap">
+                                    <?=htmlspecialchars($api->getUserFromId($review->editor)->name) ?>
+                                </th>
 
-                            <?php if($review->quality == -1): ?>
-                            <td colspan="3"><span class="badge text-bg-secondary">Čeká se na recenzi</span></td>
-                            <?php else: ?>
-                            <td><?=$review->quality ?> / 5</td>
-                            <td><?=$review->language ?> / 5</td>
-                            <td><?=$review->relevancy ?> / 5</td>
+                                <?php if($review->quality == -1): ?>
+                                <td colspan="3"><span class="badge text-bg-secondary">Čeká se na recenzi</span></td>
+                                <?php else: ?>
+                                <td class="stars text-nowrap"><?=$review->quality ?></td>
+                                <td class="stars text-nowrap"><?=$review->language ?></td>
+                                <td class="stars text-nowrap"><?=$review->relevancy ?></td>
+                                <?php endif ?>
+
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger deleteReview"><i class="fas fa-square-xmark"></i></button>
+                                </td>
+                            </tr>
+                            <?php endforeach ?>
                             <?php endif ?>
 
-                            <td>
-                                <button class="btn btn-sm btn-outline-danger deleteReview"><i class="fas fa-square-xmark"></i></button>
-                            </td>
-                        </tr>
-                        <?php endforeach ?>
-                        <?php endif ?>
-
-                        <?php if (sizeof($reviews) < 3): ?>
-                        <td colspan="5"><div class="alert alert-warning mb-0">
-                            Nízký počet recenzí, přidejte ještě <?= 3 - sizeof($reviews) ?>
-                        </div></td>
-                        <?php endif ?>
-                        </tbody>
-                    </table>
+                            <?php if (sizeof($reviews) < 3): ?>
+                            <td colspan="5"><div class="alert alert-warning mb-0">
+                                Nízký počet recenzí, přidejte ještě <?= 3 - sizeof($reviews) ?>
+                            </div></td>
+                            <?php endif ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -129,6 +131,7 @@
                 'article': article.attr('data-article'),
                 'editor': editor.val()
             }),
+            contentType: 'application/json',
             success: () => location.reload()
         })
     })
@@ -142,13 +145,13 @@
                 'task': 'delete-review',
                 'id': review.attr('data-id')
             }),
+            contentType: 'application/json',
             success: () => location.reload()
         })
     })
 
     $('.acceptArticle').on('click', (e) => {
         const article = $(e.target.closest('.card'))
-        console.log(article)
 
         $.post({
             url: '/api/admin',
@@ -157,6 +160,7 @@
                 'id': article.attr('data-article'),
                 'accept': 'true'
             }),
+            contentType: 'application/json',
             success: () => location.reload()
         })
     })
@@ -171,8 +175,19 @@
                 'id': article.attr('data-article'),
                 'accept': 'false'
             }),
+            contentType: 'application/json',
             success: () => location.reload()
         })
+    })
+
+    $('.stars').each((_, el) => {
+        const rating = Number(el.textContent);
+
+        const full = new Array(Math.floor(rating + 1)).join('<i class="fas fa-star"></i>')
+        const half = ((rating % 1) !== 0) ? '<i class="fas fa-star-half-stroke"></i>' : ''
+        const empty = new Array(Math.floor(6 - rating)).join('<i class="far fa-star"></i>')
+
+        el.innerHTML = full + half + empty
     })
 </script>
 </html>

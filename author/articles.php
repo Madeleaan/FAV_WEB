@@ -169,8 +169,7 @@
             url: '/api/article',
             type: 'PUT',
             data: JSON.stringify(data),
-            processData: false,
-            contentType: false,
+            contentType: 'application/json',
             success: () => location.reload()
         })
     })
@@ -185,8 +184,6 @@
         $.ajax({
             url: '/api/article?id=' + id,
             type: 'DELETE',
-            processData: false,
-            contentType: false,
             success: () => $(e.target).parentsUntil('.card').parent().remove()
         })
     })
