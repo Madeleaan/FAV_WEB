@@ -17,7 +17,7 @@ class ModelException extends Exception {
             ModelError::BAD_LOGIN => parent::__construct('Login does not exist', 400),
             ModelError::BAD_PASS => parent::__construct('Password is incorrect', 403),
             ModelError::BAD_TASK => parent::__construct('Admin task is not defined', 400),
-            ModelError::DB_ERROR => parent::__construct('Database error', 500),
+            ModelError::INTERNAL_ERROR => parent::__construct('Internal error', 500),
             ModelError::DISABLED_USER => parent::__construct('Disabled user', 403),
             ModelError::NO_ACCESS => parent::__construct('No access', 403),
             ModelError::ARTICLE_PUBLIC => parent::__construct('Article is public, cant edit or delete it', 403),

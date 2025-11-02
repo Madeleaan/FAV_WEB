@@ -31,6 +31,12 @@ if ($method == 'DELETE') {
         new ModelException(ModelError::MISSING_PARAMS);
     }
 
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $ftype = finfo_file($finfo, $_FILES['file']['tmp_name']);
+    finfo_close($finfo);
+
+    if($ftype != 'application/pdf') new ModelException(ModelError::BAD_FILE);
+
     $dir = "../storage/articles/";
     $file = $_FILES['file'];
     do {
@@ -38,7 +44,9 @@ if ($method == 'DELETE') {
         try {
             $filename = bin2hex(random_bytes(16)) . '.' . end($orig);
         } catch (RandomException $e) {
-            new ModelException(ModelError::DB_ERROR);
+            echo 'Internal error: ' . $e->getMessage();
+            echo 'Thrown in ' . $e->getFile() . ':' . $e->getLine();
+            new ModelException(ModelError::INTERNAL_ERROR);
         }
     } while (file_exists($dir . $filename));
     move_uploaded_file($file['tmp_name'], $dir . $filename);

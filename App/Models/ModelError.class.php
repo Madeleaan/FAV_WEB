@@ -10,7 +10,7 @@ enum ModelError {
     case BAD_LOGIN;
     case BAD_PASS;
     case BAD_TASK;
-    case DB_ERROR;
+    case INTERNAL_ERROR;
     case DISABLED_USER;
     case NO_ACCESS;
     case ARTICLE_PUBLIC;

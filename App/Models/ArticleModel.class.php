@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DateTime;
+use Exception;
 
 class ArticleModel {
     private DatabaseModel $db;
@@ -227,10 +228,16 @@ class Article {
     function __construct(array $data, UserModel $userModel) {
         $this->id = $data["id"];
         $this->title = $data['title'];
-        $this->date = new DateTime($data['date']);
         $this->abstract = $data['abstract'];
         $this->file = $data['file'];
         $this->status = $data['status'];
         $this->author = $userModel->getUser($data['author']);
+        try {
+            $this->date = new DateTime($data['date']);
+        } catch (Exception $e) {
+            echo 'Internal error: ' . $e->getMessage();
+            echo 'Thrown in ' . $e->getFile() . ':' . $e->getLine();
+            new ModelException(ModelError::INTERNAL_ERROR);
+        }
     }
 }
