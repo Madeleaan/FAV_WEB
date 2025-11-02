@@ -37,8 +37,13 @@ class AdminArticlesController implements IController {
             $articles = $this->articleModel->getAllArticles();
         }
 
-        $editors = $this->userModel->getAvailableEditors($articles);
-        $reviews = $this->reviewModel->getReviews($articles);
+        $editors = [];
+        $reviews = [];
+
+        if (is_array($articles)) {
+            $editors = $this->userModel->getAvailableEditors($articles);
+            $reviews = $this->reviewModel->getReviews($articles);
+        }
 
         return [
             "title" => $pageTitle,
