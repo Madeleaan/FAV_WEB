@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_t4qWjeCZw7
 createdAt: 2025-10-27T12:43:04.222946885
-updatedAt: 2025-10-31T08:10:31.068684767
+updatedAt: 2025-11-02T13:26:04.680217857
 workspaceId: wk_9qiF4PkEVM
 folderId: fl_nFBf49zi9M
 authentication: {}
@@ -14,5 +14,5 @@ headers: []
 method: POST
 name: Log out
 sortPriority: 1000.0
-url: localhost/api/logout
+url: localhost/api/logout.php
 urlParameters: []

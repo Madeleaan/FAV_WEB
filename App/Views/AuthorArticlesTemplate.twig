@@ -1,72 +1,63 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <title>Title - Články</title> <!-- TODO branding -->
+{% if (logged is not null) and(logged.role.value == enum('App\\Models\\Role').AUTHOR.value) %}
+<button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newModal">
+    <i class="fas fa-circle-plus me-1"></i>Přidat nový článek
+</button>
 
-    <link rel="stylesheet" href="/node_modules/quill/dist/quill.bubble.css">
-    <script src="/node_modules/quill/dist/quill.js"></script>
-    <?php include('template/commonhead.php') ?>
-</head>
-<body>
-<?php include 'template/navigation.php' ?>
-<div class="mx-2 mx-md-4">
-    <h2 class="text-center">Moje články</h2>
-    <?php
-    $api = new API();
-    $user = $api->currentUser();
-    if ($user != null && $user->role == Role::AUTHOR): $articles = $api->getUserArticles($user->login); ?>
-    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newModal">
-        <i class="fas fa-circle-plus me-1"></i>Přidat nový článek
-    </button>
+<ul class="list-group gap-3">
+    {% for article in articles %}
+    <div class="card" data-article="{{ article.id }}">
+        <div class="card-body">
+            {% switch article.status%}
+                {% case 'waiting' %}
+                    <span class="badge text-bg-info">Čeká na hodnocení</span>
+                {% case 'accepted' %}
+                    <span class="badge text-bg-success">Akceptovaný</span>
+                {% case 'denied' %}
+                    <span class="badge text-bg-danger">Zamítnutý</span>
+                {% default %}
+                    <span class="badge text-bg-secondary">Neznámý status</span>
+            {% endswitch %}
 
-    <ul class="list-group gap-3">
-        <?php foreach ($articles as $article): ?>
-        <div class="card" data-article="<?=$article->id;?>">
-            <div class="card-body">
-                <div class="d-flex gap-4 mb-2">
-                    <div class="me-auto">
-                        <?php switch($article->status):
-                            case 'waiting': ?>
-                                <span class="badge text-bg-info">Čeká na hodnocení</span>
-                                <?php break;
-                            case 'accepted': ?>
-                                <span class="badge text-bg-success">Akceptovaný</span>
-                                <?php break;
-                            case 'denied': ?>
-                                <span class="badge text-bg-danger">Zamítnutý</span>
-                                <?php break;
-                            default: ?>
-                                <span class="badge text-bg-secondary">Neznámý status</span>
-                            <?php endswitch ?>
-                        <h5 class="card-title text-decoration-underline my-2"><?=htmlspecialchars($article->title)?></h5>
-                    </div>
-                    <div class="btn-group ms-auto mb-auto">
-                        <button type="button" class="btn btn-warning" data-view-file="<?=$article->file?>"><i class="fas fa-eye me-1"></i>Zobrazit</button>
-                        <button type="button" class="btn btn-primary mx-1"
-                                data-bs-toggle="modal" data-bs-target="#editModal"
-                                <?php if ($article->status == 'accepted' || $article->status == 'denied') echo "disabled"?>>
-                            <i class="fas fa-pencil me-1"></i>Upravit</button>
-                        <button type="button" class="btn btn-outline-danger" data-delete="<?=$article->id?>"
-                                <?php if ($article->status == 'accepted' || $article->status == 'denied') echo "disabled"?>>
-                            <i class="fas fa-trash me-1"></i>Vymazat</button>
-                    </div>
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="card-title text-decoration-underline my-2">{{ article.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        <i class="fas fa-calendar-days"></i> {{ article.date | date("d. m. Y") }}
+                    </h6>
                 </div>
-                <h6 class="card-subtitle mb-2 text-body-secondary"><i class="fas fa-calendar-days"></i> <?=$article->date->format('d.m.Y')?></h6>
-                <div class="card-text">
-                    <b>Abstrakt: </b>
-                    <div class="abstract"><?=$article->abstract?></div>
+
+                <div class="btn-group col-lg-4 my-auto justify-content-end">
+                    <button type="button" class="btn btn-warning flex-lg-grow-0" data-view-file="{{ article.file }}">
+                        <i class="fas fa-eye me-1"></i>Zobrazit
+                    </button>
+
+                    <button type="button" class="btn btn-primary mx-1 flex-lg-grow-0" data-bs-toggle="modal" data-bs-target="#editModal"
+                    {% if (article.status == 'accepted') or (article.status == 'denied') %} disabled {% endif %}>
+                        <i class="fas fa-pencil me-1"></i>Upravit
+                    </button>
+
+                    <button type="button" class="btn btn-outline-danger flex-lg-grow-0" data-delete="{{ article.id }}"
+                    {% if article.status == 'accepted' %} disabled {% endif %}>
+                        <i class="fas fa-trash me-1"></i>Vymazat
+                    </button>
                 </div>
             </div>
-        <iframe class="w-100 vh-100 d-none" src="/storage/articles/<?=$article->file?>"></iframe>
-        </div>
-        <?php endforeach ?>
-    </ul>
-    <?php else: ?>
-        <div class="alert alert-danger" role="alert">Obsah pouze pro autory článků</div>
-    <?php endif ?>
-</div>
-<?php include 'template/footer.php' ?>
 
+            <div class="card-text my-2">
+                <b>Abstrakt: </b>
+                <div class="abstract">{{ article.abstract | raw }}</div>
+            </div>
+
+            <iframe class="w-100 vh-100 d-none" src="/storage/articles/{{ article.file }}"></iframe>
+        </div>
+    </div>
+    {% endfor %}
+
+</ul>
+
+{% else %}
+    <div class="alert alert-danger" role="alert">Obsah pouze pro autory článků</div>
+{% endif %}
 <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -120,7 +111,8 @@
         </div>
     </div>
 </div>
-</body>
+<script src="/node_modules/quill/dist/quill.js"></script>
+
 <script type="module">
     const editQuill = new Quill('#editEditor', {
         theme: 'bubble',
@@ -141,7 +133,7 @@
         data.append('file', file)
 
         $.post({
-            url: '/api/article',
+            url: '/api/article.php',
             enctype: 'multipart/form-data',
             data: data,
             processData: false,
@@ -166,7 +158,7 @@
         }
 
         $.ajax({
-            url: '/api/article',
+            url: '/api/article.php',
             type: 'PUT',
             data: JSON.stringify(data),
             contentType: 'application/json',
@@ -182,10 +174,10 @@
     $('button[data-delete]').on('click', (e) => {
         let id = $(e.target).attr('data-delete')
         $.ajax({
-            url: '/api/article?id=' + id,
+            url: '/api/article.php?id=' + id,
             type: 'DELETE',
-            success: () => $(e.target).parentsUntil('.card').parent().remove()
+            success: () => location.reload(),
+            error: () => console.log('bad')
         })
     })
 </script>
-</html>

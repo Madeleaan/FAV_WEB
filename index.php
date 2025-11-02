@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <title>Title</title> <!-- TODO branding -->
+<?php
 
-    <?php include('template/commonhead.php') ?>
-</head>
-<body>
-<?php include 'template/navigation.php' ?>
-<div></div>
-<?php include 'template/footer.php' ?>
-</body>
-</html>
+use App\ApplicationStart;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once("autoloader.inc.php");
+
+require_once("settings.inc.php");
+
+$app = new ApplicationStart();
+$app->appStart();

@@ -2,9 +2,30 @@
 
 namespace App\Views;
 
+use App\Models\AuthModel;
+use buzzingpixel\twigswitch\SwitchTwigExtension;
+use Exception;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
+require_once("vendor/autoload.php");
+
 /** Trida vypisujici zakladni rozlozeni stranky */
 class TemplateBasics {
-    const PAGE_INTRODUCTION = "IntroductionTemplate.tpl.php";
+    private AuthModel $authModel;
+
+    const NAVIGATION = "NavigationTemplate.twig";
+    const PAGE_INTRODUCTION = "IntroductionTemplate.twig";
+    const PAGE_PUBLIC_ARTICLES = "PublicArticlesTemplate.twig";
+    const PAGE_AUTHOR_ARTICLES = "AuthorArticlesTemplate.twig";
+    const PAGE_LOGIN = "LoginTemplate.twig";
+    const PAGE_EDITOR_REVIEWS = "EditorReviewsTemplate.twig";
+    const PAGE_ADMIN_USERS = "AdminUsersTemplate.twig";
+    const PAGE_ADMIN_ARTICLES = "AdminArticlesTemplate.twig";
+
+    public function __construct() {
+        $this->authModel = new AuthModel();
+    }
 
     /**
      * Vrati vrsek stranky po hlavni cast
@@ -23,6 +44,8 @@ class TemplateBasics {
 
             <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
             <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+            <link rel="stylesheet" href="/node_modules/quill/dist/quill.bubble.css">
+            <link rel="stylesheet" href="/node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
 
             <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
             <script src="/node_modules/jquery/dist/jquery.min.js"></script>
@@ -40,9 +63,6 @@ class TemplateBasics {
             </style>
         </head>
         <body>
-            <nav>navigace</nav>
-            <main>
-                <h1>Template: <?= $pageTitle ?></h1>
         <?php
     }
 
@@ -52,7 +72,6 @@ class TemplateBasics {
      */
     public function getHTMLFooter(): void {
         ?>
-            </main>
             <footer class="border-top bg-body-tertiary text-center p-2 mt-3">
                 <span class="align-middle text-secondary-emphasis">&copy; 2025 tomeng</span>
             </footer>
@@ -69,11 +88,30 @@ class TemplateBasics {
     public function getOutput(array $data, string $key = self::PAGE_INTRODUCTION): string {
         // Zapnuti output bufferu
         ob_start();
-        global $tplData;
-        $tplData = $data;
 
         // Vykonani sablony
-        require($key);
+        $loader = new FilesystemLoader('App/Views');
+        $twig = new Environment($loader, ['debug' => true, 'strict_variables' => true]);
+        $twig->addExtension(new SwitchTwigExtension());
+
+        try {
+            $this->getHTMLHeader($data['title']);
+
+            echo $twig->render(self::NAVIGATION, [
+                'uri' => $_SERVER['REQUEST_URI'],
+                'logged' => $this->authModel->getLoggedUser()
+            ]);
+
+            echo '<main class="mx-2 mx-md-4">';
+            echo '<h2 class="text-center">'. $data['title'] .'</h2>';
+            echo $twig->render($key, $data);
+            echo '</main>';
+
+            $this->getHTMLFooter();
+        } catch (Exception $e) {
+            echo "Error while loading template: " . $e->getMessage();
+            die();
+        }
 
         // Ziskani vypisu z bufferu
         return ob_get_clean();

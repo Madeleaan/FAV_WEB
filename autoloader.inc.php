@@ -12,6 +12,14 @@ spl_autoload_register(function ($className) {
         }
     }
 
+    foreach (FILE_EXTENSIONS as $ext) {
+        if (file_exists("../".$className . $ext)) {
+            require_once("../".$className . $ext);
+            return;
+        }
+    }
+
     echo "Failed to load: " . $className;
+    http_response_code(500);
     die();
 });

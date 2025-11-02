@@ -1,0 +1,29 @@
+<ul class="list-group gap-3">
+    {% for article in articles %}
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-10">
+                    <h5 class="card-title text-decoration-underline my-2">{{ article.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        <i class="fas fa-calendar-days"></i> {{ article.date | date("d. m. Y") }}
+                    </h6>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        <i class="fas fa-pen-fancy"></i> {{ article.author.name }}
+                    </h6>
+                </div>
+                <div class="btn-group col-lg-2 my-auto justify-content-end">
+                    <a type="button" class="btn btn-primary flex-lg-grow-0" href="/storage/articles/{{ article.file }}" target="_blank">
+                        <i class="fas fa-download me-1"></i>Stáhnout
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-text my-2">
+                <b>Abstrakt: </b>
+                <div class="abstract">{{ article.abstract | raw }}</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</ul>

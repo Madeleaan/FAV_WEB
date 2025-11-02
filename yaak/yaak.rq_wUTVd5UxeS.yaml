@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_wUTVd5UxeS
 createdAt: 2025-10-31T07:53:05.494523616
-updatedAt: 2025-10-31T08:11:15.457591725
+updatedAt: 2025-11-02T13:26:12.358309335
 workspaceId: wk_9qiF4PkEVM
 folderId: fl_vqrcdGCvjH
 authentication: {}
@@ -25,5 +25,5 @@ headers:
 method: POST
 name: Post review
 sortPriority: -0.0001
-url: localhost/api/review
+url: localhost/api/review.php
 urlParameters: []

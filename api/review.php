@@ -1,17 +1,23 @@
 <?php
+
+require_once '../autoloader.inc.php';
+use App\Models\ModelError;
+use App\Models\ModelException;
+use App\Models\ReviewModel;
+
 $method = $_SERVER['REQUEST_METHOD'];
 header("Content-Type: application/json");
 $input = json_decode(file_get_contents('php://input'), true);
 
 if ($method == 'POST') {
     if (empty($input['id']) ||empty($input['quality'] || empty('language') || empty('relevancy')))
-        error(new ApiError(ApiErrorList::MISSING_PARAMS));
+        new ModelException(ModelError::MISSING_PARAMS);
 
-    $api = new API();
-    $res = $api->addReview($input['id'], $input['quality'], $input['language'], $input['relevancy']);
-
-    if ($res != null) error($res);
-    else echo json_encode(['status' => 200]);
+    $reviewModel = new ReviewModel();
+    $res = $reviewModel->addReview($input['id'], $input['quality'], $input['language'], $input['relevancy']);
+    if ($res != null) new ModelException($res);
 } else {
-    error(new ApiError(ApiErrorList::BAD_METHOD));
+    new ModelException(ModelError::BAD_METHOD);
 }
+
+echo json_encode(["status" => 200]);

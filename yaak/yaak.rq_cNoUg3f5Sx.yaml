@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_cNoUg3f5Sx
 createdAt: 2025-10-27T12:56:20.414207159
-updatedAt: 2025-10-28T12:24:38.148789763
+updatedAt: 2025-11-02T13:26:17.904947195
 workspaceId: wk_9qiF4PkEVM
 folderId: fl_vqrcdGCvjH
 authentication: {}
@@ -24,5 +24,5 @@ headers:
 method: POST
 name: Accept article
 sortPriority: 1000.0
-url: localhost/api/admin
+url: localhost/api/admin.php
 urlParameters: []

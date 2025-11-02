@@ -1,68 +1,49 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <title>Title</title> <!-- TODO branding -->
+{% if users is iterable %}
+<table class="table table-striped table-hover">
+    <thead>
+    <tr>
+        <th>Login</th>
+        <th>Jméno</th>
+        <th>Role</th>
+        <th>Akce</th>
+    </tr>
+    </thead>
 
-    <?php include('../template/commonhead.php') ?>
-    <link rel="stylesheet" href="/node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
-    <script src="/node_modules/datatables.net/js/dataTables.min.js"></script>
-    <script src="/node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
-</head>
-<body>
-<?php include '../template/navigation.php' ?>
-<div class="mx-2 mx-md-4 d-block overflow-x-hidden">
-    <h2 class="text-center">Správa uživatelů</h2>
-    <?php
-        $api = new Api();
-        $users = $api->listUsers();
-        if (is_array($users)):
-    ?>
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>Login</th>
-                    <th>Jméno</th>
-                    <th>Role</th>
-                    <th>Akce</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td class="align-middle"><?php echo htmlspecialchars($user->login) ?></td>
-                        <td class="align-middle"><?php echo htmlspecialchars($user->name) ?></td>
-                        <td class="text-end align-middle"><?php echo $user->role->value ?></td>
-                        <td class="text-end align-middle">
-                            <?php echo $user->role->value < $api->currentUser()->role->value ? json_encode($user->enabled) : "" ?></td>
-                    </tr>
-                <?php endforeach ?>
-            </tbody>
-        </table>
-        <div class="modal fade" id="modal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title"></h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavřít</button>
-                        <button type="button" class="btn btn-primary" id="modalOk" data-bs-dismiss="modal">Potvrdit</button>
-                    </div>
-                </div>
+    <tbody>
+    {% for user in users %}
+    <tr>
+        <td class="align-middle">{{ user.login }}</td>
+        <td class="align-middle">{{ user.name }}</td>
+        <td class="text-end align-middle">{{ user.role.value }}</td>
+        <td class="text-end align-middle">
+            {{ (user.role.value < logged.role.value) ? user.enabled ? 'true' : 'false' }}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<div class="modal fade" id="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavřít</button>
+                <button type="button" class="btn btn-primary" id="modalOk" data-bs-dismiss="modal">Potvrdit</button>
             </div>
         </div>
-    <?php elseif ($users->getCode() == 403): ?>
-        <div class="alert alert-danger" role="alert">Obsah pouze pro administrátory</div>
-    <?php else: ?>
-        <div class="alert alert-danger" role="alert">Chyba: <?php echo $users->getMessage() ?></div>
-    <?php endif ?>
+    </div>
 </div>
-<?php include '../template/footer.php' ?>
-</body>
+{% else %}
+<div class="alert alert-danger" role="alert">Obsah pouze pro administrátory</div>
+{% endif %}
+<script src="/node_modules/datatables.net/js/dataTables.min.js"></script>
+<script src="/node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
+
 <script>
     $(async () => {
         const roles = {
@@ -74,7 +55,7 @@
 
         let admin;
         await $.get({
-            url: `/api/user?login=<?= $api->currentUser()->login?>`,
+            url: '/api/user.php?id={{ logged.id }}',
             success: (data) => admin = data
         })
 
@@ -189,7 +170,7 @@
             const action = okBtn.attr('data-action');
             if (['enable', 'disable'].includes(action)) {
                 $.post({
-                    url: '/api/admin',
+                    url: '/api/admin.php',
                     data: JSON.stringify({"task": "toggle-user", "login": login}),
                     contentType: 'application/json',
                     success: () => {
@@ -199,14 +180,14 @@
                 })
             } else if (action === 'delete') {
                 $.post({
-                    url: '/api/admin',
+                    url: '/api/admin.php',
                     data: JSON.stringify({"task": "delete-user", "login": login}),
                     contentType: 'application/json',
                     success: () => table.row(row).remove().draw()
                 })
             } else {
                 $.post({
-                    url: '/api/admin',
+                    url: '/api/admin.php',
                     data: JSON.stringify({"task": "change-role", "login": login, "role": okBtn.attr('data-role')}),
                     contentType: 'application/json',
                     success: () => {
@@ -217,4 +198,3 @@
         })
     })
 </script>
-</html>

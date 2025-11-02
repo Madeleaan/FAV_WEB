@@ -18,17 +18,31 @@ class DatabaseModel
     public function __construct()
     {
         $this->pdo = new PDO(
-            "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME,
-            DB_USER,
-            DB_PASS
+            "mysql:host=" . "localhost" . ";dbname=" . "web_sem",
+            "root",
+            ""
         );
         $this->pdo->exec("set names utf8");
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getAllIntroductions(): array {
-        return [
-            ["id_introduction" => 1, "date" => "2016-11-01 10:53:00", "author" => "A.B.", "title" => "Nadpis", "text" => "abcd"]
-        ];
+    public function fetchSQL(string $sql, array $params): array | null {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        if ($stmt->rowCount() == 0) return null;
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($res) return $res;
+        else return null;
+    }
+
+    public function fetchAllSQL(string $sql, array $params): array {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        if ($stmt->rowCount() == 0) return [];
+        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($res) return $res;
+        else return [];
     }
 }

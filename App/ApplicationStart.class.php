@@ -2,7 +2,8 @@
 
 namespace App;
 
-use App\Controllers\Icontroller;
+require_once 'settings.inc.php';
+use App\Controllers\IController;
 use App\Views\TemplateBasics;
 
 class ApplicationStart {
@@ -14,12 +15,11 @@ class ApplicationStart {
 
         $pageInfo = WEB_PAGES[$pageKey];
 
-        /** @var Icontroller $controller */
+        /** @var IController $controller */
         $controller = new $pageInfo['controller_class_name']();
         $data = $controller->show($pageInfo['title']);
 
-        /** @var TemplateBasics $template */
-        $template = new $pageInfo['view_class_name']();
+        $template = new TemplateBasics();
         echo $template->getOutput($data, $pageInfo['template_type']);
     }
 }

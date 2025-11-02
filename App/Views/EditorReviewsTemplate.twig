@@ -1,0 +1,89 @@
+{% if (logged is not null) and(logged.role.value == enum('App\\Models\\Role').EDITOR.value) %}
+<ul class="list-group gap-3">
+    {% for review in reviews %}
+    <div class="card">
+        <div class="card-body">
+            {% switch review.article.status %}
+                {% case 'waiting' %}
+                <span class="badge text-bg-info">Čeká na hodnocení</span>
+                {% case 'accepted' %}
+                <span class="badge text-bg-success">Akceptovaný</span>
+                {% case 'denied' %}
+                <span class="badge text-bg-danger">Zamítnutý</span>
+                {% default %}
+                <span class="badge text-bg-secondary">Neznámý status</span>
+            {% endswitch %}
+
+            <div class="row">
+                <div class="col-lg-10">
+                    <h5 class="card-title text-decoration-underline my-2">{{ review.article.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        <i class="fas fa-calendar-days"></i> {{ review.article.date | date('d. m. Y') }}
+                    </h6>
+                </div>
+
+                <div class="btn-group col-lg-2 my-auto justify-content-end">
+                    <a type="button" class="btn btn-primary flex-lg-grow-0"
+                       href="/storage/articles/{{ review.article.file }}" target="_blank">
+                        <i class="fas fa-download me-1"></i>Stáhnout
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-text my-2">
+                <b>Abstrakt: </b>
+                <div class="abstract">{{ review.article.abstract | raw }}</div>
+            </div>
+
+            {% if review.article.status == 'waiting' %}
+            <form id="reviewForm" data-id="{{ review.id }}">
+                <div class="row mx-3">
+                    <div class="input-group mb-3 col-lg">
+                        <label class="input-group-text" for="quality">Kvalita</label>
+                        <input type="number" min="1" max="5" step="0.5"
+                               value="{{ review.quality != -1 ? review.quality }}"
+                               class="form-control" id="quality" name="quality">
+                    </div>
+
+                    <div class="input-group mb-3 col-lg">
+                        <label class="input-group-text" for="language">Jazyk</label>
+                        <input type="number" min="1" max="5" step="0.5"
+                               value="{{ review.language != -1 ? review.language }}"
+                               class="form-control" id="language" name="language">
+                    </div>
+
+                    <div class="input-group mb-3 col-lg">
+                        <label class="input-group-text" for="relevancy">Relevance</label>
+                        <input type="number" min="1" max="5" step="0.5"
+                               value="{{ review.relevancy != -1 ? review.relevancy }}"
+                               class="form-control" id="relevancy" name="relevancy">
+                    </div>
+
+                    <button type="submit" class="btn btn-success mb-3 col-12 col-lg-2">Uložit recenzi</button>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="alert alert-danger" role="alert">Obsah pouze pro autory článků</div>
+{% endif %}
+<script>
+    $('form').on('submit', (e) => {
+        e.preventDefault()
+
+        const formData = $(e.target).serializeArray()
+        let postData = {}
+        $.each(formData, (k, v) => postData[v.name] = v.value)
+        postData['id'] = $(e.target).attr('data-id')
+
+        $.post({
+            url: '/api/review.php',
+            data: JSON.stringify(postData),
+            contentType: 'application/json',
+            success: () => location.reload(),
+        })
+    })
+</script>

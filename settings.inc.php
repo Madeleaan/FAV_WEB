@@ -1,27 +1,7 @@
 <?php
-//// Pripojeni k DB ////
-
-/** DB server */
 
 use App\Controllers;
 use App\Views;
-
-const DB_SERVER = "localhost";
-/** Nazev DB */
-const DB_NAME = "web_sem";
-/** DB uzivatel */
-const DB_USER = "root";
-/** Heslo uzivatele */
-const DB_PASS = "";
-
-//// Tabulky ////
-
-/** Tabulka s uzivateli */
-const TABLE_USERS = "users";
-/** Tabulka se clanky */
-const TABLE_ARTICLES = "articles";
-/** Tabulka s recenzemi */
-const TABLE_REVIEWS = "reviews";
 
 //// Dostupne stranky ////
 
@@ -29,11 +9,52 @@ const TABLE_REVIEWS = "reviews";
 const DEFAULT_WEBPAGE = "uvod";
 /** Stranky */
 const WEB_PAGES = [
-    "uvod" =>[
+    "uvod" => [
         "title" => "Úvodní stránka",
 
         "controller_class_name" => Controllers\IntroductionController::class,
-        "view_class_name" => Views\TemplateBasics::class,
         "template_type" => Views\TemplateBasics::PAGE_INTRODUCTION
+    ],
+
+    "clanky" => [
+        "title" => "Veřejné články",
+
+        "controller_class_name" => Controllers\PublicArticlesController::class,
+        "template_type" => Views\TemplateBasics::PAGE_PUBLIC_ARTICLES
+    ],
+
+    "login" => [
+        "title" => "Přihlášení",
+
+        "controller_class_name" => Controllers\LoginController::class,
+        "template_type" => Views\TemplateBasics::PAGE_LOGIN
+    ],
+
+    "author/articles" => [
+        "title" => "Moje články",
+
+        "controller_class_name" => Controllers\AuthorArticlesController::class,
+        "template_type" => Views\TemplateBasics::PAGE_AUTHOR_ARTICLES
+    ],
+
+    "editor/reviews" => [
+        "title" => "Moje recenze",
+
+        "controller_class_name" => Controllers\EditorReviewsController::class,
+        "template_type" => Views\TemplateBasics::PAGE_EDITOR_REVIEWS
+    ],
+
+    "admin/users" => [
+        "title" => "Správa uživatelů",
+
+        "controller_class_name" => Controllers\AdminUsersController::class,
+        "template_type" => Views\TemplateBasics::PAGE_ADMIN_USERS
+    ],
+
+    "admin/articles" => [
+        "title" => "Správa článků",
+
+        "controller_class_name" => Controllers\AdminArticlesController::class,
+        "template_type" => Views\TemplateBasics::PAGE_ADMIN_ARTICLES
     ]
 ];

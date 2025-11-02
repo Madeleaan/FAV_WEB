@@ -1,12 +1,18 @@
 <?php
+
+require_once '../autoloader.inc.php';
+use App\Models\AuthModel;
+use App\Models\ModelError;
+use App\Models\ModelException;
+
 $method = $_SERVER['REQUEST_METHOD'];
+header("Content-Type: application/json");
 
 if ($method == 'POST') {
-    logout();
+    $auth = new AuthModel();
+    $auth->logoutUser();
 } else {
-    error(new ApiError(ApiErrorList::BAD_METHOD));
+    new ModelException(ModelError::BAD_METHOD);
 }
 
-function logout(): void {
-    session_destroy();
-}
+echo json_encode(["status" => 200]);

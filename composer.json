@@ -3,6 +3,8 @@
     "ext-pdo": "*",
     "ext-json": "*",
     "ext-curl": "*",
-    "ext-fileinfo": "*"
+    "ext-fileinfo": "*",
+    "twig/twig": "v3.22.0",
+    "buzzingpixel/twig-switch": "1.0.2"
   }
 }

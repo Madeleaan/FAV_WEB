@@ -1,25 +1,31 @@
 <?php
+
+require_once '../autoloader.inc.php';
+use App\Models\ModelError;
+use App\Models\ModelException;
+use App\Models\UserModel;
+
 $method = $_SERVER['REQUEST_METHOD'];
 header("Content-Type: application/json");
 
 if ($method == 'GET') {
-    $api = new API();
-    if (empty($_GET['login'])) {
-        error(new ApiError(ApiErrorList::MISSING_PARAMS));
-    } else {
-        $login = $_GET['login'];
-        $res = $api->getUser($login);
-        if ($res instanceof User) {
-            echo json_encode ([
-                "login" => $res->login,
-                "name" => $res->name,
-                "role" => $res->role,
-                "enabled" => $res->enabled,
-            ]);
-        } else {
-            error($res);
-        }
+    if (empty($_GET['id'])) {
+        new ModelException(ModelError::MISSING_PARAMS);
     }
+
+    $userModel = new UserModel();
+    $res = $userModel->getUser($_GET['id']);
+
+    if ($res == null) {
+        new ModelException(ModelError::BAD_ID);
+    }
+
+    echo json_encode([
+        'login' => $res->login,
+        'name' => $res->name,
+        'role' => $res->role,
+        'enabled' => $res->enabled,
+    ]);
 } else {
-    error(new ApiError(ApiErrorList::BAD_METHOD));
+    new ModelException(ModelError::BAD_METHOD);
 }

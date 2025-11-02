@@ -1,28 +1,33 @@
 <?php
+
+require_once '../autoloader.inc.php';
+use App\Models\AuthModel;
+use App\Models\ModelError;
+use App\Models\ModelException;
+
 $method = $_SERVER['REQUEST_METHOD'];
+header("Content-Type: application/json");
 $input = json_decode(file_get_contents('php://input'), true);
 
 if ($method == 'POST') {
     if (empty($input['login']) || empty($input['password']) || empty($input['name'])) {
-        error(new ApiError(ApiErrorList::MISSING_PARAMS));
+        new ModelException(ModelError::MISSING_PARAMS);
     }
 
     if(strlen($input['password']) < 6) {
-        error(new ApiError(ApiErrorList::WEAK_PASSWORD));
+        new ModelException(ModelError::WEAK_PASSWORD);
     }
 
     $exp = "/^\w+$/";
     if (!preg_match($exp, $input['login'])) {
-        error(new ApiError(ApiErrorList::ILLEGAL_LOGIN));
+        new ModelException(ModelError::ILLEGAL_LOGIN);
     }
 
-    $api = new Api();
-    $res = $api->createUser($input['login'], $input['password'], $input['name']);
-    if ($res != null) {
-        error($res);
-    } else {
-        json_encode(["status" => 200]);
-    }
+    $auth = new AuthModel();
+    $res = $auth->createUser($input['login'], $input['password'], $input['name']);
+    if ($res != null) new ModelException($res);
 } else {
-    error(new ApiError(ApiErrorList::BAD_METHOD));
+    new ModelException(ModelError::BAD_METHOD);
 }
+
+echo json_encode(["status" => 200]);

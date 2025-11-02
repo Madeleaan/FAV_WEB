@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_wRXDpkZhZ8
 createdAt: 2025-10-31T08:10:38.679656371
-updatedAt: 2025-10-31T08:12:47.211195825
+updatedAt: 2025-11-02T13:26:09.011623524
 workspaceId: wk_9qiF4PkEVM
 folderId: fl_nFBf49zi9M
 authentication: {}
@@ -23,5 +23,5 @@ headers:
 method: POST
 name: Login as editor
 sortPriority: 2000.0011
-url: localhost/api/login
+url: localhost/api/login.php
 urlParameters: []

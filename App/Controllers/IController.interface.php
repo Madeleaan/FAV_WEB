@@ -5,7 +5,7 @@ namespace App\Controllers;
 /**
  * Interface pro controllery
  */
-interface Icontroller {
+interface IController {
     /**
      * Zajisti vypsani stranky
      *
