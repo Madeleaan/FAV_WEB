@@ -1,4 +1,4 @@
-{% if articles is iterable %}
+{% if (logged is not null) and(logged.role.value >= enum('App\\Models\\Role').ADMIN.value) %}
 <ul class="list-group gap-3">
     {% for article in articles %}
     {% set editors = (allEditors.(article.id) is defined) ? allEditors.(article.id) : [] %}

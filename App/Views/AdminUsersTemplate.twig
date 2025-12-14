@@ -1,4 +1,4 @@
-{% if users is iterable %}
+{% if (logged is not null) and(logged.role.value >= enum('App\\Models\\Role').ADMIN.value) %}
 <table class="table table-striped table-hover">
     <thead>
     <tr>
@@ -55,7 +55,7 @@
 
         let admin;
         await $.get({
-            url: '/api/user.php?id={{ logged.id }}',
+            url: '/api/user.php?id={{ (logged is not null) ? logged.id : "" }}',
             success: (data) => admin = data
         })
 
